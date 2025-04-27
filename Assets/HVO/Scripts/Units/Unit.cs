@@ -1,4 +1,6 @@
+using UnityEditor;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 public abstract class Unit : MonoBehaviour
 {
@@ -13,6 +15,7 @@ public abstract class Unit : MonoBehaviour
         {
             m_Animator = animator;
         }
+        var manager = GameManager.Get();
+        manager.Test();
     }
-
 }
