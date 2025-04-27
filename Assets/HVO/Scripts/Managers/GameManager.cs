@@ -1,34 +1,9 @@
 using UnityEngine;
 
-public class GameManager : MonoBehaviour
+public class GameManager : SingletonManager<GameManager>
 {
-    protected virtual void Awake()
-    {
-        GameManager[] managers = FindObjectsByType<GameManager>(FindObjectsSortMode.None);
-        if (managers.Length > 1)
-        {
-            Destroy(gameObject);
-            return;
-        }
-    }
-
-    public static GameManager Get()
-    {
-        var tag = nameof(GameManager); // Unitydeki tag ismiyle burasi ayni olmali.
-        GameObject managerObject = GameObject.FindWithTag(tag);
-        if(managerObject != null)
-        {
-            return managerObject.GetComponent<GameManager>();
-        }
-
-        GameObject go = new(tag);
-        go.tag = tag;
-        return go.AddComponent<GameManager>();
-    }
-
     public void Test()
     {
         Debug.Log("Test Game Manager");
     }
-
 }
