@@ -1161,7 +1161,7 @@ Tilemap:
       - {fileID: 7752229987998269982, guid: 987fe38bb54018643a8e26d12c31b4a2, type: 3}
       - {fileID: -4710801888167562894, guid: 987fe38bb54018643a8e26d12c31b4a2, type: 3}
       - {fileID: 6853023835892009477, guid: 987fe38bb54018643a8e26d12c31b4a2, type: 3}
-      m_AnimationSpeed: 10
+      m_AnimationSpeed: 10.000001
       m_AnimationTimeOffset: 0
       m_Flags: 0
   - first: {x: -11, y: -5, z: 0}
@@ -1341,7 +1341,7 @@ Tilemap:
       - {fileID: 7752229987998269982, guid: 987fe38bb54018643a8e26d12c31b4a2, type: 3}
       - {fileID: -4710801888167562894, guid: 987fe38bb54018643a8e26d12c31b4a2, type: 3}
       - {fileID: 6853023835892009477, guid: 987fe38bb54018643a8e26d12c31b4a2, type: 3}
-      m_AnimationSpeed: 10
+      m_AnimationSpeed: 10.000001
       m_AnimationTimeOffset: 0
       m_Flags: 0
   - first: {x: -11, y: 1, z: 0}
@@ -1827,6 +1827,8 @@ GameObject:
   - component: {fileID: 315789147}
   - component: {fileID: 315789146}
   - component: {fileID: 315789148}
+  - component: {fileID: 315789149}
+  - component: {fileID: 315789150}
   m_Layer: 0
   m_Name: Builder
   m_TagString: Untagged
@@ -1926,6 +1928,31 @@ Animator:
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
   m_WriteDefaultValuesOnDisable: 0
+--- !u!114 &315789149
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 315789145}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: af7b1eb57c024fe4b88c80b95e5ce5a5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &315789150
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 315789145}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d5c1a29dec9445742a47e599aed4affe, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Speed: 3
 --- !u!1 &449947808
 GameObject:
   m_ObjectHideFlags: 0
@@ -4550,6 +4577,8 @@ GameObject:
   - component: {fileID: 825638372}
   - component: {fileID: 825638371}
   - component: {fileID: 825638373}
+  - component: {fileID: 825638374}
+  - component: {fileID: 825638375}
   m_Layer: 0
   m_Name: Warrior
   m_TagString: Untagged
@@ -4649,6 +4678,31 @@ Animator:
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
   m_WriteDefaultValuesOnDisable: 0
+--- !u!114 &825638374
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 825638370}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: af7b1eb57c024fe4b88c80b95e5ce5a5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &825638375
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 825638370}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d5c1a29dec9445742a47e599aed4affe, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Speed: 3
 --- !u!1 &905805872
 GameObject:
   m_ObjectHideFlags: 0
@@ -14965,7 +15019,7 @@ Tilemap:
       - {fileID: 6808463656719756590, guid: 66ff9666614558c4cb5c19c84172e4ca, type: 3}
       - {fileID: 393194626552862583, guid: 66ff9666614558c4cb5c19c84172e4ca, type: 3}
       - {fileID: 7062963900064476109, guid: 66ff9666614558c4cb5c19c84172e4ca, type: 3}
-      m_AnimationSpeed: 10
+      m_AnimationSpeed: 10.000001
       m_AnimationTimeOffset: 0
       m_Flags: 0
   - first: {x: 1, y: -8, z: 0}
@@ -15070,7 +15124,7 @@ Tilemap:
       - {fileID: 6808463656719756590, guid: 66ff9666614558c4cb5c19c84172e4ca, type: 3}
       - {fileID: 393194626552862583, guid: 66ff9666614558c4cb5c19c84172e4ca, type: 3}
       - {fileID: 7062963900064476109, guid: 66ff9666614558c4cb5c19c84172e4ca, type: 3}
-      m_AnimationSpeed: 10
+      m_AnimationSpeed: 10.000001
       m_AnimationTimeOffset: 0
       m_Flags: 0
   - first: {x: 15, y: -2, z: 0}
