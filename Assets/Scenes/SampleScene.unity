@@ -1296,7 +1296,7 @@ Tilemap:
       - {fileID: 7752229987998269982, guid: 987fe38bb54018643a8e26d12c31b4a2, type: 3}
       - {fileID: -4710801888167562894, guid: 987fe38bb54018643a8e26d12c31b4a2, type: 3}
       - {fileID: 6853023835892009477, guid: 987fe38bb54018643a8e26d12c31b4a2, type: 3}
-      m_AnimationSpeed: 10.000001
+      m_AnimationSpeed: 10
       m_AnimationTimeOffset: 0
       m_Flags: 0
   - first: {x: 10, y: -1, z: 0}
@@ -4638,7 +4638,7 @@ Transform:
   m_GameObject: {fileID: 825638370}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -3.5211358, y: -0.8626582, z: 0}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -4736,6 +4736,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 673623fec49af104c83d5fb097fe3af9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  ActiveUnit: {fileID: 315789149}
 --- !u!1 &905805872
 GameObject:
   m_ObjectHideFlags: 0
