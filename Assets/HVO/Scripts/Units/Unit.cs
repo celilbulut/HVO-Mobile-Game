@@ -2,10 +2,16 @@ using UnityEngine;
 
 public abstract class Unit : MonoBehaviour
 {
+    [SerializeField]
+    private Material m_HighlightMaterial;
+
     public bool IsMoving;
+    public bool IsTarget;
     protected Animator m_Animator;
     protected AIPawn m_AIPawn;
     protected SpriteRenderer m_SpriteRenderer;
+    protected Material m_OriginalMaterial;
+
     protected void Awake()
     {
         if (TryGetComponent<Animator>(out var animator))
@@ -18,6 +24,7 @@ public abstract class Unit : MonoBehaviour
             m_AIPawn = aiPawn;
         }
         m_SpriteRenderer = GetComponent<SpriteRenderer>();
+        m_OriginalMaterial = m_SpriteRenderer.material;
     }
 
     public void MoveTo(Vector3 destination)
@@ -26,5 +33,27 @@ public abstract class Unit : MonoBehaviour
         m_SpriteRenderer.flipX = direction.x < 0;
 
         m_AIPawn.SetDestination(destination);
+    }
+
+    public void Select()
+    {
+        Highlight();
+        IsTarget = true;
+    }
+
+    public void DeSelect()
+    {
+        UnHighlight();
+        IsTarget = false;
+    }
+
+    void Highlight()
+    {
+        m_SpriteRenderer.material = m_HighlightMaterial;
+    }
+
+    void UnHighlight()
+    {
+        m_SpriteRenderer.material = m_OriginalMaterial;
     }
 }
