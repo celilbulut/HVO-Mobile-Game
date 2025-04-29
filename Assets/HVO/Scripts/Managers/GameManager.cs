@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 
 public class GameManager : SingletonManager<GameManager>
@@ -58,8 +59,11 @@ public class GameManager : SingletonManager<GameManager>
 
     void HandleClickOnGround(Vector2 worldPoint)
     {
-        DisplayClickEffect(worldPoint);
-        ActiveUnit.MoveTo(worldPoint);
+        if(HasActiveUnit && IsHumanoid(ActiveUnit))
+        {
+            DisplayClickEffect(worldPoint);
+            ActiveUnit.MoveTo(worldPoint);
+        }
     }
 
     void HandleClickOnUnit(Unit unit)
@@ -76,6 +80,11 @@ public class GameManager : SingletonManager<GameManager>
 
         ActiveUnit = unit;
         ActiveUnit.Select();
+    }
+
+    bool IsHumanoid(Unit unit)
+    {
+        return unit is HumanoidUnit;
     }
 
     void DisplayClickEffect(Vector2 worldPoint)
