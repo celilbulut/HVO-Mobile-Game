@@ -2,14 +2,14 @@ using UnityEngine;
 
 public class AIPawn : MonoBehaviour
 {
-    [SerializeField]
-    private float m_Speed = 5f;
+    [SerializeField] private float m_Speed = 5f;
+    
     private Vector3? m_Destination;
     public Vector3? Destination => m_Destination;
 
     void Start()
     {
-        SetDestination(new Vector3(4.5f, 0, 0));
+        SetDestination(new Vector3(0, 0, 0));
     }
 
     void Update()

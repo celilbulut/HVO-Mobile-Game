@@ -1,4 +1,4 @@
-using System;
+
 using UnityEngine;
 
 public class GameManager : SingletonManager<GameManager>
@@ -10,6 +10,11 @@ public class GameManager : SingletonManager<GameManager>
     public Unit ActiveUnit;
     private Vector2 m_InitialTouchPosition;
     public bool HasActiveUnit => ActiveUnit != null;
+
+    void Start()
+    {
+        ClearActionBarUI();
+    }
 
     void Update()
     {
@@ -116,6 +121,21 @@ public class GameManager : SingletonManager<GameManager>
 
     void ShowUnitActions()
     {
+        ClearActionBarUI();
+
+        var hardCodedActions = 2;
+
+        for (int i =0; i < hardCodedActions; i++)
+        {
+            m_ActionBar.RegisterAction();
+        }
+
         m_ActionBar.Show();
+    }
+
+    void ClearActionBarUI()
+    {
+        m_ActionBar.ClearActions();
+        m_ActionBar.Hide();
     }
 }
