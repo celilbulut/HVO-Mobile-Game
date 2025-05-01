@@ -5,10 +5,12 @@ public class GameManager : SingletonManager<GameManager>
 {
     [Header("UI")]
     [SerializeField] private PointToClick m_PointToClickPrefab;
+    [SerializeField] private ActionBar m_ActionBar;
+
     public Unit ActiveUnit;
     private Vector2 m_InitialTouchPosition;
-
     public bool HasActiveUnit => ActiveUnit != null;
+
     void Update()
     {
         Vector2 inputPosition = Input.touchCount > 0 ? Input.GetTouch(0).position : Input.mousePosition;
@@ -88,6 +90,7 @@ public class GameManager : SingletonManager<GameManager>
 
         ActiveUnit = unit;
         ActiveUnit.Select();
+        ShowUnitActions();
     }
 
     bool HasClickedOnActiveUnit(Unit clickedUnit)
@@ -106,13 +109,13 @@ public class GameManager : SingletonManager<GameManager>
         ActiveUnit = null;
     }
 
-    public void Test()
-    {
-        Debug.Log("Hello World");
-    }
-
     void DisplayClickEffect(Vector2 worldPoint)
     {
         Instantiate(m_PointToClickPrefab, (Vector3)worldPoint, Quaternion.identity);
+    }
+
+    void ShowUnitActions()
+    {
+        m_ActionBar.Show();
     }
 }

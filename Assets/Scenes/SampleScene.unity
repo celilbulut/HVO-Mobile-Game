@@ -1101,7 +1101,7 @@ Tilemap:
       - {fileID: 7752229987998269982, guid: 987fe38bb54018643a8e26d12c31b4a2, type: 3}
       - {fileID: -4710801888167562894, guid: 987fe38bb54018643a8e26d12c31b4a2, type: 3}
       - {fileID: 6853023835892009477, guid: 987fe38bb54018643a8e26d12c31b4a2, type: 3}
-      m_AnimationSpeed: 10
+      m_AnimationSpeed: 10.000001
       m_AnimationTimeOffset: 0
       m_Flags: 0
   - first: {x: 7, y: -6, z: 0}
@@ -1356,7 +1356,7 @@ Tilemap:
       - {fileID: 7752229987998269982, guid: 987fe38bb54018643a8e26d12c31b4a2, type: 3}
       - {fileID: -4710801888167562894, guid: 987fe38bb54018643a8e26d12c31b4a2, type: 3}
       - {fileID: 6853023835892009477, guid: 987fe38bb54018643a8e26d12c31b4a2, type: 3}
-      m_AnimationSpeed: 10.000001
+      m_AnimationSpeed: 10
       m_AnimationTimeOffset: 0
       m_Flags: 0
   - first: {x: 10, y: 1, z: 0}
@@ -1521,7 +1521,7 @@ Tilemap:
       - {fileID: 7752229987998269982, guid: 987fe38bb54018643a8e26d12c31b4a2, type: 3}
       - {fileID: -4710801888167562894, guid: 987fe38bb54018643a8e26d12c31b4a2, type: 3}
       - {fileID: 6853023835892009477, guid: 987fe38bb54018643a8e26d12c31b4a2, type: 3}
-      m_AnimationSpeed: 10.000001
+      m_AnimationSpeed: 10
       m_AnimationTimeOffset: 0
       m_Flags: 0
   - first: {x: -5, y: 4, z: 0}
@@ -5113,7 +5113,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_PointToClickPrefab: {fileID: 6356413411080974542, guid: f94282266e2aa0a4aac85a56c195ba11, type: 3}
-  ActiveUnit: {fileID: 315789149}
+  m_ActionBar: {fileID: 920528578}
+  ActiveUnit: {fileID: 0}
 --- !u!1 &905805872
 GameObject:
   m_ObjectHideFlags: 0
@@ -5513,6 +5514,7 @@ GameObject:
   - component: {fileID: 920528576}
   - component: {fileID: 920528575}
   - component: {fileID: 920528577}
+  - component: {fileID: 920528578}
   m_Layer: 5
   m_Name: ActionBar
   m_TagString: Untagged
@@ -5605,6 +5607,19 @@ MonoBehaviour:
   m_ChildScaleWidth: 0
   m_ChildScaleHeight: 0
   m_ReverseArrangement: 0
+--- !u!114 &920528578
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 920528573}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 234f45b026209384ea74c084e8e1b791, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_BackgroundImage: {fileID: 920528575}
 --- !u!1 &984658112
 GameObject:
   m_ObjectHideFlags: 0
@@ -15020,9 +15035,9 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 858130261}
+      - m_Target: {fileID: 0}
         m_TargetAssemblyTypeName: GameManager, Assembly-CSharp
-        m_MethodName: Test
+        m_MethodName: 
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
