@@ -1,36 +1,53 @@
-using System;
+
 using UnityEngine;
+using UnityEngine.EventSystems;
+using System.Collections.Generic;
 
 public class GameManager : SingletonManager<GameManager>
 {
     [Header("UI")]
     [SerializeField] private PointToClick m_PointToClickPrefab;
+    [SerializeField] private ActionBar m_ActionBar;
+
     public Unit ActiveUnit;
     private Vector2 m_InitialTouchPosition;
 
+    public Vector2 InputPosition => Input.touchCount > 0 ? Input.GetTouch(0).position : Input.mousePosition;
+    public bool IsLeftClickOrTapDown => Input.GetMouseButtonDown(0) || (Input.touchCount > 0 && Input.GetTouch(0).phase == TouchPhase.Began);
+    public bool IsLeftClickOrTapUp => Input.GetMouseButtonUp(0) || (Input.touchCount > 0 && Input.GetTouch(0).phase == TouchPhase.Ended);
+
     public bool HasActiveUnit => ActiveUnit != null;
+
+    void Start()
+    {
+        ClearActionBarUI();
+    }
+
     void Update()
     {
-        Vector2 inputPosition = Input.touchCount > 0 ? Input.GetTouch(0).position : Input.mousePosition;
-
         // 0 sol mause buttonunu, 1 ise sag mause buttonunu temsil ediyor.
-        if(Input.GetMouseButtonDown(0) || (Input.touchCount > 0 && Input.GetTouch(0).phase == TouchPhase.Began))
+        if(IsLeftClickOrTapDown)
         {
-            m_InitialTouchPosition = inputPosition;
+            m_InitialTouchPosition = InputPosition;
         }
 
         // 0 sol mause buttonunu, 1 ise sag mause buttonunu temsil ediyor.
-        if(Input.GetMouseButtonUp(0) || (Input.touchCount > 0 && Input.GetTouch(0).phase == TouchPhase.Ended))
+        if(IsLeftClickOrTapUp)
         {
-            if (Vector2.Distance(m_InitialTouchPosition, inputPosition) < 10 )
+            if (Vector2.Distance(m_InitialTouchPosition, InputPosition) < 5 )
             {
-                DetectClick(inputPosition);
+                DetectClick(InputPosition);
             }
         }
     }
 
     void DetectClick(Vector2 inputPosition)
     {
+        if(IsPointerOverUIElement())
+        {
+            return;
+        }
+
         Vector2 worldPoint = Camera.main.ScreenToWorldPoint(inputPosition);
         RaycastHit2D hit = Physics2D.Raycast(worldPoint, Vector2.zero);
 
@@ -42,8 +59,6 @@ public class GameManager : SingletonManager<GameManager>
         {
             HandleClickOnGround(worldPoint);
         }
-
-        HandleClickOnGround(worldPoint);
     }
 
     bool HasClickedOnUnit(RaycastHit2D hit, out Unit unit)
@@ -88,6 +103,7 @@ public class GameManager : SingletonManager<GameManager>
 
         ActiveUnit = unit;
         ActiveUnit.Select();
+        ShowUnitActions();
     }
 
     bool HasClickedOnActiveUnit(Unit clickedUnit)
@@ -104,10 +120,45 @@ public class GameManager : SingletonManager<GameManager>
     {
         ActiveUnit.DeSelect();
         ActiveUnit = null;
+
+        ClearActionBarUI();
     }
 
     void DisplayClickEffect(Vector2 worldPoint)
     {
         Instantiate(m_PointToClickPrefab, (Vector3)worldPoint, Quaternion.identity);
+    }
+
+    void ShowUnitActions()
+    {
+        ClearActionBarUI();
+
+        var hardCodedActions = 2;
+
+        for (int i = 0; i < hardCodedActions; i++)
+        {
+            m_ActionBar.RegisterAction();
+        }
+
+        m_ActionBar.Show();
+    }
+
+    void ClearActionBarUI()
+    {
+        m_ActionBar.ClearActions();
+        m_ActionBar.Hide();
+    }
+
+    bool IsPointerOverUIElement() //Action bara artik tiklayinca ilerlemiyor unit oraya dogru.
+    {
+        PointerEventData eventData = new PointerEventData(EventSystem.current)
+        {
+            position = InputPosition
+        };
+
+        List<RaycastResult> results = new List<RaycastResult>();
+        EventSystem.current.RaycastAll(eventData, results);
+
+        return results.Count > 0;
     }
 }
