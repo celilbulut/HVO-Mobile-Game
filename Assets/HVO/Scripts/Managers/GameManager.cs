@@ -1,6 +1,7 @@
 
 using UnityEngine;
 using UnityEngine.EventSystems;
+using System.Collections.Generic;
 
 public class GameManager : SingletonManager<GameManager>
 {
@@ -132,7 +133,7 @@ public class GameManager : SingletonManager<GameManager>
 
         var hardCodedActions = 2;
 
-        for (int i =0; i < hardCodedActions; i++)
+        for (int i = 0; i < hardCodedActions; i++)
         {
             m_ActionBar.RegisterAction();
         }
@@ -146,16 +147,16 @@ public class GameManager : SingletonManager<GameManager>
         m_ActionBar.Hide();
     }
 
-    bool IsPointerOverUIElement()
+    bool IsPointerOverUIElement() //Action bara artik tiklayinca ilerlemiyor unit oraya dogru.
     {
-        if(Input.touchCount > 0)
+        PointerEventData eventData = new PointerEventData(EventSystem.current)
         {
-            var touch = Input.GetTouch(0);
-            return EventSystem.current.IsPointerOverGameObject(touch.fingerId);
-        }
-        else
-        {
-            return EventSystem.current.IsPointerOverGameObject();
-        }
+            position = InputPosition
+        };
+
+        List<RaycastResult> results = new List<RaycastResult>();
+        EventSystem.current.RaycastAll(eventData, results);
+
+        return results.Count > 0;
     }
 }
