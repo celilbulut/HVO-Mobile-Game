@@ -1,6 +1,7 @@
 
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Events;
 using UnityEngine.UI;
 
 public class ActionBar : MonoBehaviour
@@ -16,10 +17,10 @@ public class ActionBar : MonoBehaviour
         m_OriginalBackgroundColor = m_BackgroundImage.color;
     }
 
-    public void RegisterAction(Sprite icon)
+    public void RegisterAction(Sprite icon, UnityAction action)
     {
         var actionButton = Instantiate(m_ActionButtonPrefab, transform);
-        actionButton.Init(icon);
+        actionButton.Init(icon, action);
         m_ActionButtons.Add(actionButton);
     }
 
