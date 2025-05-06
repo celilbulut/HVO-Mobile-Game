@@ -11,6 +11,7 @@ public class GameManager : SingletonManager<GameManager>
 
     public Unit ActiveUnit;
     private Vector2 m_InitialTouchPosition;
+    private PlacementProcess m_PlacementProcess;
 
     public Vector2 InputPosition => Input.touchCount > 0 ? Input.GetTouch(0).position : Input.mousePosition;
     public bool IsLeftClickOrTapDown => Input.GetMouseButtonDown(0) || (Input.touchCount > 0 && Input.GetTouch(0).phase == TouchPhase.Began);
@@ -25,25 +26,34 @@ public class GameManager : SingletonManager<GameManager>
 
     void Update()
     {
-        // 0 sol mause buttonunu, 1 ise sag mause buttonunu temsil ediyor.
-        if(IsLeftClickOrTapDown)
+        if(m_PlacementProcess != null)
         {
-            m_InitialTouchPosition = InputPosition;
+            m_PlacementProcess.Update();            
         }
 
-        // 0 sol mause buttonunu, 1 ise sag mause buttonunu temsil ediyor.
-        if(IsLeftClickOrTapUp)
+        else
         {
-            if (Vector2.Distance(m_InitialTouchPosition, InputPosition) < 5 )
+            // 0 sol mause buttonunu, 1 ise sag mause buttonunu temsil ediyor.
+            if(IsLeftClickOrTapDown)
             {
-                DetectClick(InputPosition);
+                m_InitialTouchPosition = InputPosition;
+            }
+
+            // 0 sol mause buttonunu, 1 ise sag mause buttonunu temsil ediyor.
+            if(IsLeftClickOrTapUp)
+            {
+                if (Vector2.Distance(m_InitialTouchPosition, InputPosition) < 5 )
+                {
+                    DetectClick(InputPosition);
+                }
             }
         }
     }
 
     public void StartBuildProcess(BuildActionSO buildActionSO)
     {
-        Debug.Log("Starting action: " + buildActionSO.ActionName);
+        m_PlacementProcess = new PlacementProcess(buildActionSO);
+        m_PlacementProcess.ShowPlacementOutline();
     }
 
     void DetectClick(Vector2 inputPosition)
