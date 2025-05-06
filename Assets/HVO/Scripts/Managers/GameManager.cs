@@ -10,7 +10,6 @@ public class GameManager : SingletonManager<GameManager>
     [SerializeField] private ActionBar m_ActionBar;
 
     public Unit ActiveUnit;
-    private Vector2 m_InitialTouchPosition;
     private PlacementProcess m_PlacementProcess;
 
     public bool HasActiveUnit => ActiveUnit != null;
@@ -27,22 +26,9 @@ public class GameManager : SingletonManager<GameManager>
             m_PlacementProcess.Update();            
         }
 
-        else
+        else if (HvoUtils.TryGetShortClickPosition(out Vector2 inputPos))
         {
-            // 0 sol mause buttonunu, 1 ise sag mause buttonunu temsil ediyor.
-            if(HvoUtils.IsLeftClickOrTapDown)
-            {
-                m_InitialTouchPosition = HvoUtils.InputPosition;
-            }
-
-            // 0 sol mause buttonunu, 1 ise sag mause buttonunu temsil ediyor.
-            if(HvoUtils.IsLeftClickOrTapUp)
-            {
-                if (Vector2.Distance(m_InitialTouchPosition, HvoUtils.InputPosition) < 5 )
-                {
-                    DetectClick(HvoUtils.InputPosition);
-                }
-            }
+            DetectClick(inputPos);
         }
     }
 
@@ -54,7 +40,7 @@ public class GameManager : SingletonManager<GameManager>
 
     void DetectClick(Vector2 inputPosition)
     {
-        if(IsPointerOverUIElement())
+        if(HvoUtils.IsPointerOverUIElement())
         {
             return;
         }
@@ -164,18 +150,5 @@ public class GameManager : SingletonManager<GameManager>
     {
         m_ActionBar.ClearActions();
         m_ActionBar.Hide();
-    }
-
-    bool IsPointerOverUIElement() //Action bara artik tiklayinca ilerlemiyor unit oraya dogru.
-    {
-        PointerEventData eventData = new PointerEventData(EventSystem.current)
-        {
-            position = HvoUtils.InputPosition
-        };
-
-        List<RaycastResult> results = new List<RaycastResult>();
-        EventSystem.current.RaycastAll(eventData, results);
-
-        return results.Count > 0;
     }
 }
