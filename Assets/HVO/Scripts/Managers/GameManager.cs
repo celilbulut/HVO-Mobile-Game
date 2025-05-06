@@ -10,11 +10,7 @@ public class GameManager : SingletonManager<GameManager>
     [SerializeField] private ActionBar m_ActionBar;
 
     public Unit ActiveUnit;
-    private Vector2 m_InitialTouchPosition;
-
-    public Vector2 InputPosition => Input.touchCount > 0 ? Input.GetTouch(0).position : Input.mousePosition;
-    public bool IsLeftClickOrTapDown => Input.GetMouseButtonDown(0) || (Input.touchCount > 0 && Input.GetTouch(0).phase == TouchPhase.Began);
-    public bool IsLeftClickOrTapUp => Input.GetMouseButtonUp(0) || (Input.touchCount > 0 && Input.GetTouch(0).phase == TouchPhase.Ended);
+    private PlacementProcess m_PlacementProcess;
 
     public bool HasActiveUnit => ActiveUnit != null;
 
@@ -25,30 +21,26 @@ public class GameManager : SingletonManager<GameManager>
 
     void Update()
     {
-        // 0 sol mause buttonunu, 1 ise sag mause buttonunu temsil ediyor.
-        if(IsLeftClickOrTapDown)
+        if(m_PlacementProcess != null)
         {
-            m_InitialTouchPosition = InputPosition;
+            m_PlacementProcess.Update();            
         }
 
-        // 0 sol mause buttonunu, 1 ise sag mause buttonunu temsil ediyor.
-        if(IsLeftClickOrTapUp)
+        else if (HvoUtils.TryGetShortClickPosition(out Vector2 inputPos))
         {
-            if (Vector2.Distance(m_InitialTouchPosition, InputPosition) < 5 )
-            {
-                DetectClick(InputPosition);
-            }
+            DetectClick(inputPos);
         }
     }
 
     public void StartBuildProcess(BuildActionSO buildActionSO)
     {
-        Debug.Log("Starting action: " + buildActionSO.ActionName);
+        m_PlacementProcess = new PlacementProcess(buildActionSO);
+        m_PlacementProcess.ShowPlacementOutline();
     }
 
     void DetectClick(Vector2 inputPosition)
     {
-        if(IsPointerOverUIElement())
+        if(HvoUtils.IsPointerOverUIElement())
         {
             return;
         }
@@ -158,18 +150,5 @@ public class GameManager : SingletonManager<GameManager>
     {
         m_ActionBar.ClearActions();
         m_ActionBar.Hide();
-    }
-
-    bool IsPointerOverUIElement() //Action bara artik tiklayinca ilerlemiyor unit oraya dogru.
-    {
-        PointerEventData eventData = new PointerEventData(EventSystem.current)
-        {
-            position = InputPosition
-        };
-
-        List<RaycastResult> results = new List<RaycastResult>();
-        EventSystem.current.RaycastAll(eventData, results);
-
-        return results.Count > 0;
     }
 }
