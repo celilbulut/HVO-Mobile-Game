@@ -13,10 +13,6 @@ public class GameManager : SingletonManager<GameManager>
     private Vector2 m_InitialTouchPosition;
     private PlacementProcess m_PlacementProcess;
 
-    public Vector2 InputPosition => Input.touchCount > 0 ? Input.GetTouch(0).position : Input.mousePosition;
-    public bool IsLeftClickOrTapDown => Input.GetMouseButtonDown(0) || (Input.touchCount > 0 && Input.GetTouch(0).phase == TouchPhase.Began);
-    public bool IsLeftClickOrTapUp => Input.GetMouseButtonUp(0) || (Input.touchCount > 0 && Input.GetTouch(0).phase == TouchPhase.Ended);
-
     public bool HasActiveUnit => ActiveUnit != null;
 
     void Start()
@@ -34,17 +30,17 @@ public class GameManager : SingletonManager<GameManager>
         else
         {
             // 0 sol mause buttonunu, 1 ise sag mause buttonunu temsil ediyor.
-            if(IsLeftClickOrTapDown)
+            if(HvoUtils.IsLeftClickOrTapDown)
             {
-                m_InitialTouchPosition = InputPosition;
+                m_InitialTouchPosition = HvoUtils.InputPosition;
             }
 
             // 0 sol mause buttonunu, 1 ise sag mause buttonunu temsil ediyor.
-            if(IsLeftClickOrTapUp)
+            if(HvoUtils.IsLeftClickOrTapUp)
             {
-                if (Vector2.Distance(m_InitialTouchPosition, InputPosition) < 5 )
+                if (Vector2.Distance(m_InitialTouchPosition, HvoUtils.InputPosition) < 5 )
                 {
-                    DetectClick(InputPosition);
+                    DetectClick(HvoUtils.InputPosition);
                 }
             }
         }
@@ -174,7 +170,7 @@ public class GameManager : SingletonManager<GameManager>
     {
         PointerEventData eventData = new PointerEventData(EventSystem.current)
         {
-            position = InputPosition
+            position = HvoUtils.InputPosition
         };
 
         List<RaycastResult> results = new List<RaycastResult>();
