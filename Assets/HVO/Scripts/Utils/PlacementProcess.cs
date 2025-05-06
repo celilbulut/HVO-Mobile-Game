@@ -1,5 +1,4 @@
 
-
 using UnityEngine;
 
 public class PlacementProcess
@@ -14,7 +13,17 @@ public class PlacementProcess
 
     public void Update() 
     {
+        Vector2 screenPosition = Input.touchCount > 0 ?
+            Input.GetTouch(0).position : //Akilli telefonlar icin.
+            Input.GetMouseButton(0) ? Input.mousePosition : Vector2.zero; // Bilgisayar icin.
 
+        Vector3 worldPosition = Camera.main.ScreenToWorldPoint(screenPosition);
+        m_PlacementOutline.transform.position = worldPosition;
+
+        if(screenPosition != Vector2.zero)
+        {
+            m_PlacementOutline.transform.position = new Vector3(worldPosition.x, worldPosition.y, 0);
+        }
     }
 
     public void ShowPlacementOutline()
