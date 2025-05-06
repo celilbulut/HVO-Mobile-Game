@@ -30,6 +30,7 @@ public static class HvoUtils
         return false;
     }
 
+    //PlacementProcess.cs ile baglantili.
     public static bool TryGetHoldPosition(out Vector3 worldPosition)
     {
         if(Input.touchCount > 0)
@@ -46,6 +47,7 @@ public static class HvoUtils
         return false;
     }
 
+    //GameManager.cs ile baglantili.
     public static bool IsPointerOverUIElement() //Action bara artik tiklayinca ilerlemiyor unit oraya dogru.
     {
         if(Input.touchCount > 0)
