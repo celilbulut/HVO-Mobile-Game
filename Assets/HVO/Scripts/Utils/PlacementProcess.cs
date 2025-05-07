@@ -1,15 +1,18 @@
 
 using UnityEngine;
+using UnityEngine.Tilemaps;
 
 public class PlacementProcess
 {
     private GameObject m_PlacementOutline;
     private BuildActionSO m_BuildAction;
     private Vector3Int[] m_HighlightPositions;
+    private Tilemap m_WalkableTilemap;
 
-    public PlacementProcess(BuildActionSO buildActionSO)
+    public PlacementProcess(BuildActionSO buildActionSO, Tilemap walkableTilemap)
     {
         m_BuildAction = buildActionSO;
+        m_WalkableTilemap = walkableTilemap;
     }
 
     public void Update() 
@@ -50,11 +53,11 @@ public class PlacementProcess
                 m_HighlightPositions[x + y * buildingSize.x] = new Vector3Int((int)outlinePosition.x + x, (int)outlinePosition.y + y, 0);
             }
         }
+
         foreach (var tilePosition in m_HighlightPositions)
         {
-            Debug.Log(tilePosition);    
+            m_WalkableTilemap.SetTileFlags(tilePosition, TileFlags.None); // bu sayede tile in color ini degistirebiliyoruz.
+            m_WalkableTilemap.SetColor(tilePosition, Color.green);
         }
-
-        Debug.Log("----------------------------------------");
     }
 }

@@ -1,10 +1,11 @@
 
 using UnityEngine;
-using UnityEngine.EventSystems;
-using System.Collections.Generic;
+using UnityEngine.Tilemaps;
 
 public class GameManager : SingletonManager<GameManager>
 {
+    [Header("Tilemaps")]
+    [SerializeField] private Tilemap m_WalkableTileMap;
     [Header("UI")]
     [SerializeField] private PointToClick m_PointToClickPrefab;
     [SerializeField] private ActionBar m_ActionBar;
@@ -34,7 +35,7 @@ public class GameManager : SingletonManager<GameManager>
 
     public void StartBuildProcess(BuildActionSO buildActionSO)
     {
-        m_PlacementProcess = new PlacementProcess(buildActionSO);
+        m_PlacementProcess = new PlacementProcess(buildActionSO , m_WalkableTileMap);
         m_PlacementProcess.ShowPlacementOutline();
     }
 
