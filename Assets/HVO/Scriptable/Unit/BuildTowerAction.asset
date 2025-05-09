@@ -18,5 +18,7 @@ MonoBehaviour:
   m_PlacementSprite: {fileID: 21300000, guid: 57a95d68804ce834eb1c0a857c68fe34, type: 3}
   m_FoundationSprite: {fileID: 0}
   m_CompletionSprite: {fileID: 0}
+  m_BuildingSize: {x: 2, y: 3, z: 0}
+  m_OriginOffset: {x: -1, y: -2, z: 0}
   m_GoldCost: 0
   m_WoodCost: 0
