@@ -17,7 +17,7 @@ public class PlacementProcess
     public PlacementProcess(BuildActionSO buildActionSO, 
                             Tilemap walkableTilemap, 
                             Tilemap overlayTilemap,
-                            Tilemap[] unreachableTileMaps)
+                            Tilemap[] unreachableTileMaps)                            
     {
         m_PlaceholderTileSprite = Resources.Load<Sprite>("Images/PlaceholderTileSprite"); //Yazim onemli.
         m_BuildAction = buildActionSO;
@@ -99,7 +99,7 @@ public class PlacementProcess
 
     bool CanPlaceTile(Vector3Int tilePosition)
     {
-        return m_WalkableTilemap.HasTile(tilePosition) && !IsInUnreachableTilemap(tilePosition);
+        return m_WalkableTilemap.HasTile(tilePosition) && !IsInUnreachableTilemap(tilePosition) && !IsBlockedByGameObject(tilePosition);
     }
 
     bool IsInUnreachableTilemap(Vector3Int tilePosition)
@@ -107,6 +107,23 @@ public class PlacementProcess
         foreach(var tilemap in m_UnreachableTileMaps)
         {
             if(tilemap.HasTile(tilePosition)) return true;
+        }
+
+        return false;
+    }
+
+    bool IsBlockedByGameObject(Vector3Int tilePosition)
+    {
+        Vector3 tileSize = m_WalkableTilemap.cellSize;
+        Collider2D[] colliders = Physics2D.OverlapBoxAll(tilePosition + tileSize / 2, tileSize * 0.5f, 0);
+
+        foreach(var collider in colliders)
+        {
+            var layer = collider.gameObject.layer;
+            if(layer == LayerMask.NameToLayer("Player"))
+            {
+                return true;
+            }
         }
 
         return false;
