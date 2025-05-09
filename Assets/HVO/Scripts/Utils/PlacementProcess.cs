@@ -10,7 +10,8 @@ public class PlacementProcess
     private Tilemap m_WalkableTilemap;
     private Tilemap m_OverlayTileMap;
     private Sprite m_PlaceholderTileSprite;
-
+    private Color m_HighlightColor = new Color(0, 0.8f, 1, 0.4f);
+    private Color m_BlockedColor = new Color(1f, 0.2f, 0, 0.8f);
 
     public PlacementProcess(BuildActionSO buildActionSO, Tilemap walkableTilemap, Tilemap overlayTilemap)
     {
@@ -50,7 +51,7 @@ public class PlacementProcess
     {
         Vector3Int buildingSize = m_BuildAction.BuildingSize;
         Vector3 pivotPosition = outlinePosition + m_BuildAction.OriginOffset;
-        
+
         ClearHighlights();
 
         m_HighlightPositions = new Vector3Int[buildingSize.x * buildingSize.y];
@@ -67,7 +68,16 @@ public class PlacementProcess
         {
             var tile = ScriptableObject.CreateInstance<Tile>();
             tile.sprite = m_PlaceholderTileSprite;
-            tile.color = new Color(0, 0.8f, 1, 0.4f);
+
+            if(CanPlaceTile(tilePosition))
+            {
+                tile.color = m_HighlightColor;
+            }
+            else
+            {
+                tile.color = m_BlockedColor;                
+            }
+
             m_OverlayTileMap.SetTile(tilePosition, tile);            
         }
     }
@@ -80,5 +90,10 @@ public class PlacementProcess
         {
             m_OverlayTileMap.SetTile(tilePosition, null);
         }
+    }
+
+    bool CanPlaceTile(Vector3Int tilePosition)
+    {
+        return m_WalkableTilemap.HasTile(tilePosition);
     }
 }
