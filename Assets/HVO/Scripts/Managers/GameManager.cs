@@ -6,6 +6,8 @@ public class GameManager : SingletonManager<GameManager>
 {
     [Header("Tilemaps")]
     [SerializeField] private Tilemap m_WalkableTileMap;
+    [SerializeField] private Tilemap m_OverlayTileMap;
+
     [Header("UI")]
     [SerializeField] private PointToClick m_PointToClickPrefab;
     [SerializeField] private ActionBar m_ActionBar;
@@ -35,7 +37,7 @@ public class GameManager : SingletonManager<GameManager>
 
     public void StartBuildProcess(BuildActionSO buildActionSO)
     {
-        m_PlacementProcess = new PlacementProcess(buildActionSO , m_WalkableTileMap);
+        m_PlacementProcess = new PlacementProcess(buildActionSO , m_WalkableTileMap, m_OverlayTileMap);
         m_PlacementProcess.ShowPlacementOutline();
     }
 

@@ -8,11 +8,16 @@ public class PlacementProcess
     private BuildActionSO m_BuildAction;
     private Vector3Int[] m_HighlightPositions;
     private Tilemap m_WalkableTilemap;
+    private Tilemap m_OverlayTileMap;
+    private Sprite m_PlaceholderTileSprite;
 
-    public PlacementProcess(BuildActionSO buildActionSO, Tilemap walkableTilemap)
+
+    public PlacementProcess(BuildActionSO buildActionSO, Tilemap walkableTilemap, Tilemap overlayTilemap)
     {
+        m_PlaceholderTileSprite = Resources.Load<Sprite>("Images/PlaceholderTileSprite"); //Yazim onemli.
         m_BuildAction = buildActionSO;
         m_WalkableTilemap = walkableTilemap;
+        m_OverlayTileMap = overlayTilemap;
     }
 
     public void Update() 
@@ -57,8 +62,12 @@ public class PlacementProcess
 
         foreach (var tilePosition in m_HighlightPositions)
         {
-            m_WalkableTilemap.SetTileFlags(tilePosition, TileFlags.None); // bu sayede tile in color ini degistirebiliyoruz.
-            m_WalkableTilemap.SetColor(tilePosition, Color.green);
+            var tile = ScriptableObject.CreateInstance<Tile>();
+            tile.sprite = m_PlaceholderTileSprite;
+            tile.color = new Color(0, 0.8f, 1, 0.4f);
+            m_OverlayTileMap.SetTile(tilePosition, tile);
+            //m_OverlayTileMap.SetTileFlags(tilePosition, TileFlags.None); // bu sayede tile in color ini degistirebiliyoruz.
+            //m_OverlayTileMap.SetColor(tilePosition, Color.green);
         }
     }
 }
