@@ -53,7 +53,27 @@ public class PlacementProcess
     public void Cleanup() //UI da kalan placementlari kaldiriyor.
     {
         Object.Destroy(m_PlacementOutline);
-        ClearHighlights();
+        ClearHighlights();        
+    }
+
+    public bool TryFinalizePlacement(out Vector3 buildPosition)
+    {
+        if(IsPlacementAreaValid())
+        {
+            ClearHighlights();
+            buildPosition = m_PlacementOutline.transform.position;
+            Object.Destroy(m_PlacementOutline);
+            return true;
+        }
+        
+        Debug.Log("Invalid Placement Area");
+        buildPosition = Vector3.zero;
+        return false;
+    }
+
+    bool IsPlacementAreaValid()
+    {
+        return true;
     }
 
     Vector3 SnapToGrid(Vector3 worldPosition)
