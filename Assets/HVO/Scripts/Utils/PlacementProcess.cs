@@ -50,6 +50,12 @@ public class PlacementProcess
         renderer.sprite = m_BuildAction.PlacementSprite; // Towerin seklini cikartmak icin.
     }
 
+    public void Cleanup() //UI da kalan placementlari kaldiriyor.
+    {
+        Object.Destroy(m_PlacementOutline);
+        ClearHighlights();
+    }
+
     Vector3 SnapToGrid(Vector3 worldPosition)
     {
         return new Vector3(Mathf.FloorToInt(worldPosition.x), Mathf.FloorToInt(worldPosition.y), 0);
@@ -97,6 +103,7 @@ public class PlacementProcess
         {
             m_OverlayTileMap.SetTile(tilePosition, null);
         }
+        m_HighlightPositions = null;
     }
 
     bool CanPlaceTile(Vector3Int tilePosition)
