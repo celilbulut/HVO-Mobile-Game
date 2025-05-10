@@ -48,6 +48,7 @@ public class GameManager : SingletonManager<GameManager>
                                                   
         m_PlacementProcess.ShowPlacementOutline();        
         m_BuildConfirmationBar.Show();
+        m_BuildConfirmationBar.SetupHooks(ConfirmBuildPlacement, CancelBuildPlacement);
     }
 
     void DetectClick(Vector2 inputPosition)
@@ -162,5 +163,15 @@ public class GameManager : SingletonManager<GameManager>
     {
         m_ActionBar.ClearActions();
         m_ActionBar.Hide();
+    }
+
+    void ConfirmBuildPlacement()
+    {
+        Debug.Log("ConfirmBuildPlacement()");
+    }
+
+    void CancelBuildPlacement()
+    {
+        Debug.Log("CancelBuildPlacement()");
     }
 }
