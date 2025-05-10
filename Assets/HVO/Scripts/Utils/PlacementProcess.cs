@@ -14,6 +14,11 @@ public class PlacementProcess
     private Color m_HighlightColor = new Color(0, 0.8f, 1, 0.4f);
     private Color m_BlockedColor = new Color(1f, 0.2f, 0, 0.8f);
 
+    public BuildActionSO BuildAction => m_BuildAction;
+    public int GoldCost => m_BuildAction.GoldCost;
+    public int WoodCost => m_BuildAction.WoodCost;
+
+
     public PlacementProcess(BuildActionSO buildActionSO, 
                             Tilemap walkableTilemap, 
                             Tilemap overlayTilemap,
