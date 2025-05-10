@@ -65,7 +65,7 @@ public class PlacementProcess
             Object.Destroy(m_PlacementOutline);
             return true;
         }
-        
+
         Debug.Log("Invalid Placement Area");
         buildPosition = Vector3.zero;
         return false;
@@ -73,6 +73,11 @@ public class PlacementProcess
 
     bool IsPlacementAreaValid()
     {
+        foreach(var tilePosition in m_HighlightPositions)
+        {
+            if(!CanPlaceTile(tilePosition)) return false;
+        }
+
         return true;
     }
 
