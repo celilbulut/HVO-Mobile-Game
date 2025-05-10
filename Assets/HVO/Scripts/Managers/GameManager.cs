@@ -12,9 +12,15 @@ public class GameManager : SingletonManager<GameManager>
     [Header("UI")]
     [SerializeField] private PointToClick m_PointToClickPrefab;
     [SerializeField] private ActionBar m_ActionBar;
+    [SerializeField] private ConfirmationBar m_BuildConfirmationBar;
 
     public Unit ActiveUnit;
     private PlacementProcess m_PlacementProcess;
+
+    private int m_Gold = 1000;
+    private int m_Wood = 1000;
+    public int Gold => m_Gold;
+    public int Wood => m_Wood;
 
     public bool HasActiveUnit => ActiveUnit != null;
 
@@ -38,12 +44,16 @@ public class GameManager : SingletonManager<GameManager>
 
     public void StartBuildProcess(BuildActionSO buildActionSO)
     {
+        if (m_PlacementProcess != null) return;
+
         m_PlacementProcess = new PlacementProcess(buildActionSO, 
                                                   m_WalkableTileMap, 
                                                   m_OverlayTileMap, 
                                                   m_UnreachableTilemaps);
                                                   
-        m_PlacementProcess.ShowPlacementOutline();
+        m_PlacementProcess.ShowPlacementOutline();        
+        m_BuildConfirmationBar.Show(buildActionSO.GoldCost, buildActionSO.WoodCost);
+        m_BuildConfirmationBar.SetupHooks(ConfirmBuildPlacement, CancelBuildPlacement);
     }
 
     void DetectClick(Vector2 inputPosition)
@@ -158,5 +168,55 @@ public class GameManager : SingletonManager<GameManager>
     {
         m_ActionBar.ClearActions();
         m_ActionBar.Hide();
+    }
+
+    void ConfirmBuildPlacement()
+    {
+        if(!TryDeductResources(m_PlacementProcess.GoldCost, m_PlacementProcess.WoodCost))
+        {
+            Debug.Log("Not Enough Resources!");
+            return;
+        }
+
+        if(m_PlacementProcess.TryFinalizePlacement(out Vector3 buildPosition))
+        {
+            m_BuildConfirmationBar.Hide();
+            m_PlacementProcess = null;
+            Debug.Log("Foundations layed out: " + buildPosition);
+        }
+        else
+        {
+            RevertResources(m_PlacementProcess.GoldCost, m_PlacementProcess.WoodCost);
+        }
+    }
+
+    void RevertResources(int gold, int wood)
+    {
+        m_Gold += gold;
+        m_Wood += wood;
+    }
+
+    void CancelBuildPlacement()
+    {
+        m_BuildConfirmationBar.Hide();
+        m_PlacementProcess.Cleanup();
+        m_PlacementProcess = null;
+    }
+
+    bool TryDeductResources(int goldCost, int woodCost)
+    {
+        if(m_Gold >= goldCost && m_Wood >= woodCost)
+        {
+            m_Gold -= goldCost;
+            m_Wood -= woodCost;
+            return true;
+        }
+        return false;
+    }
+
+    void OnGUI()
+    {
+        GUI.Label(new Rect(50, 40, 200, 20), "Gold: " + m_Gold.ToString(), new GUIStyle{ fontSize = 50});
+        GUI.Label(new Rect(50, 100, 200, 20), "Wood: " + m_Wood.ToString(), new GUIStyle{ fontSize = 50});
     }
 }
