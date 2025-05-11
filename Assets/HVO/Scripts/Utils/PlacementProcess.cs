@@ -33,11 +33,12 @@ public class PlacementProcess
 
     public void Update() 
     {
+       
         if (m_PlacementOutline != null)
         {
             HighlightTiles(m_PlacementOutline.transform.position);
         }
-
+        
         if (HvoUtils.IsPointerOverUIElement()) return;
 
         if (HvoUtils.TryGetHoldPosition(out Vector3 worldPosition))
