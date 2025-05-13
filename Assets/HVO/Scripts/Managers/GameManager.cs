@@ -185,6 +185,7 @@ public class GameManager : SingletonManager<GameManager>
             new BuildingProcess(m_PlacementProcess.BuildAction, buildPosition);
 
             ActiveUnit.MoveTo(buildPosition);
+            ActiveUnit.SetTask(UnitTask.Build);
 
             m_PlacementProcess = null;            
         }
@@ -220,7 +221,13 @@ public class GameManager : SingletonManager<GameManager>
 
     void OnGUI()
     {
-        GUI.Label(new Rect(50, 40, 200, 20), "Gold: " + m_Gold.ToString(), new GUIStyle{ fontSize = 50});
-        GUI.Label(new Rect(50, 100, 200, 20), "Wood: " + m_Wood.ToString(), new GUIStyle{ fontSize = 50});
+        GUI.Label(new Rect(50, 40, 200, 20), "Gold: " + m_Gold.ToString(), new GUIStyle{ fontSize = 40});
+        GUI.Label(new Rect(50, 80, 200, 20), "Wood: " + m_Wood.ToString(), new GUIStyle{ fontSize = 40});
+
+        if (ActiveUnit != null)
+        {
+            GUI.Label(new Rect(50, 120, 200, 20), "State: " + ActiveUnit.CurrentState.ToString(), new GUIStyle{ fontSize = 40});
+            GUI.Label(new Rect(50, 160, 200, 20), "Task: " + ActiveUnit.CurrentTask.ToString(), new GUIStyle{ fontSize = 40});
+        }
     }
 }

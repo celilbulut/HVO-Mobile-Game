@@ -1,11 +1,27 @@
 using UnityEngine;
 
+public enum UnitState
+{
+    Idle, 
+    Moving, 
+    Attacking,
+    Chopping, 
+    Minning
+}
+public enum UnitTask
+{
+    None,
+    Build,
+    Chop,
+    Mine,
+    Attack,
+}
+
 public abstract class Unit : MonoBehaviour
 {
     [SerializeField] private ActionSO[] m_Actions;
     [SerializeField] private float m_ObjectDetectionRadius = 3f;
 
-    public bool IsMoving;
     public bool IsTarget;
     protected Animator m_Animator;
     protected AIPawn m_AIPawn;
@@ -15,6 +31,10 @@ public abstract class Unit : MonoBehaviour
 
     public ActionSO[] Actions => m_Actions;
     public SpriteRenderer Renderer => m_SpriteRenderer;
+
+    public UnitState CurrentState { get; protected set; } = UnitState.Idle;
+    public UnitTask CurrentTask { get; protected set; } = UnitTask.None;
+
 
     protected void Awake()
     {
@@ -30,6 +50,16 @@ public abstract class Unit : MonoBehaviour
         m_SpriteRenderer = GetComponent<SpriteRenderer>();
         m_OriginalMaterial = m_SpriteRenderer.material;
         m_HighlightMaterial = Resources.Load<Material>("Materials/Outline");
+    }
+
+    public void SetTask(UnitTask task)
+    {
+        OnSetTask(CurrentTask, task);
+    }
+
+    public void SetState(UnitState state)
+    {
+        OnSetState(CurrentState, state);
     }
 
     public void MoveTo(Vector3 destination)
@@ -50,6 +80,16 @@ public abstract class Unit : MonoBehaviour
     {
         UnHighlight();
         IsTarget = false;
+    }
+
+    protected virtual void OnSetTask(UnitTask oldTask, UnitTask newTask)
+    {
+        CurrentTask = newTask;
+    }
+
+    protected virtual void OnSetState(UnitState oldState, UnitState newState)
+    {
+        CurrentState = newState;
     }
 
     protected Collider2D[] RunProximityObjectDetection()
