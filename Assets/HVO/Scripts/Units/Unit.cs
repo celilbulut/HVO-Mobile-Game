@@ -36,6 +36,8 @@ public abstract class Unit : MonoBehaviour
     public UnitTask CurrentTask { get; protected set; } = UnitTask.None;
     public Unit Target {get; protected set;}
 
+    public bool HasTarget => Target != null;
+
 
     protected void Awake()
     {
@@ -74,6 +76,7 @@ public abstract class Unit : MonoBehaviour
         m_SpriteRenderer.flipX = direction.x < 0;
 
         m_AIPawn.SetDestination(destination);
+        OnSetDestination();
     }
 
     public void Select()
@@ -86,6 +89,11 @@ public abstract class Unit : MonoBehaviour
     {
         UnHighlight();
         IsTarget = false;
+    }
+
+    protected virtual void OnSetDestination()
+    {
+
     }
 
     protected virtual void OnSetTask(UnitTask oldTask, UnitTask newTask)
