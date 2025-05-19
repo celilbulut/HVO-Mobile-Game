@@ -5,17 +5,34 @@ public class WorkerUnit : HumanoidUnit
 {
     protected override void UpdateBehaviour()
     {
-        CheckForCloseObjects();
+        //eger gorevimiz yoksa hic birseyi check etmeyecek.
+        if(CurrentTask != UnitTask.None)
+        {
+            CheckForCloseObjects();
+        }
     }
 
-    private void CheckForCloseObjects()
+    void CheckForCloseObjects()
     {
+        Debug.Log("Checking!");
         var hits = RunProximityObjectDetection();
 
         foreach(var hit in hits)
         {
             if (hit.gameObject == this.gameObject) continue;
-            Debug.Log(hit.gameObject.name);
+
+            if(CurrentTask == UnitTask.Build && hit.gameObject == Target.gameObject)
+            {
+                if (hit.TryGetComponent<StructureUnit>(out var unit))
+                {
+                    StartBuilding(unit);
+                }
+            }         
         }
+    }
+
+    void StartBuilding(StructureUnit unit)
+    {
+        Debug.Log("Starting building: " + unit.gameObject.name);
     }
 }
