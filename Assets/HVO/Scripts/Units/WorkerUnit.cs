@@ -6,9 +6,10 @@ public class WorkerUnit : HumanoidUnit
     protected override void UpdateBehaviour()
     {
         //eger gorevimiz yoksa hic birseyi check etmeyecek.
-        if(CurrentTask != UnitTask.None)
+        if (CurrentTask != UnitTask.Build && HasTarget)
         {
-            CheckForCloseObjects();
+            CheckForConstruction();
+            //CheckForCloseObjects();
         }
     }
 
@@ -24,6 +25,42 @@ public class WorkerUnit : HumanoidUnit
         SetTask(UnitTask.Build);
     }
 
+    void CheckForConstruction()
+    {
+        var distanceToConstruction = Vector3.Distance(transform.position, Target.transform.position);
+        if (distanceToConstruction <= m_ObjectDetectionRadius)
+        {
+            StartBuilding(Target as StructureUnit);
+        }
+    }
+
+    void StartBuilding(StructureUnit structure)
+    {
+        structure.AssignWorkerToBuildProcess(this);
+        //Debug.Log("Starting building: " + unit.gameObject.name);
+    }
+
+    void ResetState()
+    {
+        SetTask(UnitTask.None);
+
+        if (HasTarget) CleanupTarget();
+    }
+
+    void CleanupTarget()
+    {
+        if (Target is StructureUnit structure)
+        {
+            structure.UnassignWorkerToBuildProcess();
+        }
+        SetTarget(null);
+    }
+}
+
+
+
+
+/*
     void CheckForCloseObjects()
     {
         Debug.Log("Checking!");
@@ -42,26 +79,4 @@ public class WorkerUnit : HumanoidUnit
             }         
         }
     }
-
-    void StartBuilding(StructureUnit structure)
-    {
-        structure.AssignWorkerToBuildProcess(this);
-        //Debug.Log("Starting building: " + unit.gameObject.name);
-    }
-
-    void ResetState()
-    {
-        SetTask(UnitTask.None);
-
-        if(HasTarget) CleanupTarget();
-    }
-
-    void CleanupTarget()
-    {
-        if(Target is StructureUnit structure)
-        {
-            structure.UnassignWorkerToBuildProcess();
-        }
-        SetTarget(null);
-    }
-}
+*/
