@@ -6,10 +6,9 @@ public class WorkerUnit : HumanoidUnit
     protected override void UpdateBehaviour()
     {
         //eger gorevimiz yoksa hic birseyi check etmeyecek.
-        if (CurrentTask != UnitTask.Build && HasTarget)
+        if (CurrentTask == UnitTask.Build && HasTarget)
         {
             CheckForConstruction();
-            //CheckForCloseObjects();
         }
     }
 
@@ -36,8 +35,11 @@ public class WorkerUnit : HumanoidUnit
 
     void StartBuilding(StructureUnit structure)
     {
+        SetState(UnitState.Building);
+        //Isim onemli. Animasyondaki ismi tetikliyoruz buradan.
+        m_Animator.SetBool("IsBuilding", true);
+
         structure.AssignWorkerToBuildProcess(this);
-        //Debug.Log("Starting building: " + unit.gameObject.name);
     }
 
     void ResetState()
@@ -45,6 +47,9 @@ public class WorkerUnit : HumanoidUnit
         SetTask(UnitTask.None);
 
         if (HasTarget) CleanupTarget();
+
+        //Isim onemli. Animasyondaki ismi tetikliyoruz buradan.
+        m_Animator.SetBool("IsBuilding", false);
     }
 
     void CleanupTarget()

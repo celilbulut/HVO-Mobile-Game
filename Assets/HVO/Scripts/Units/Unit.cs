@@ -2,11 +2,12 @@ using UnityEngine;
 
 public enum UnitState
 {
-    Idle, 
-    Moving, 
+    Idle,
+    Moving,
     Attacking,
-    Chopping, 
-    Minning
+    Chopping,
+    Minning,
+    Building
 }
 public enum UnitTask
 {
