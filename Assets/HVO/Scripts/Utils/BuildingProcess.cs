@@ -8,10 +8,10 @@ public class BuildingProcess
     public bool HasActiveWorker => m_Worker != null;
 
     public BuildingProcess(
-                            BuildActionSO buildAction, 
-                            Vector3 placementPosition, 
+                            BuildActionSO buildAction,
+                            Vector3 placementPosition,
                             WorkerUnit worker
-                            )        
+                            )
     {
         m_BuildAction = buildAction;
         var structure = Object.Instantiate(buildAction.StructurePrefab);
@@ -19,10 +19,7 @@ public class BuildingProcess
         structure.transform.position = placementPosition;
         structure.RegisterProcess(this);
 
-        
-        worker.MoveTo(placementPosition);
-        worker.SetTask(UnitTask.Build);
-        worker.SetTarget(structure);
+        worker.SendToBuild(structure);
     }
 
     public void Update() 

@@ -98,15 +98,29 @@ public class GameManager : SingletonManager<GameManager>
 
     void HandleClickOnUnit(Unit unit)
     {
-        if(HasActiveUnit)
+        if (HasActiveUnit)
         {
-            if(HasClickedOnActiveUnit(unit))
+            if (HasClickedOnActiveUnit(unit))
             {
                 CancelActiveUnit();
                 return;
             }
+            else if (WorkerClickedOnUnfinishedBuilding(unit))
+            {
+                ((WorkerUnit)ActiveUnit).SendToBuild(unit as StructureUnit);
+                return;
+            }
         }
+
         SelectNewUnit(unit);
+    }
+
+    bool WorkerClickedOnUnfinishedBuilding(Unit clickedUnit)
+    {
+        return
+            ActiveUnit is WorkerUnit &&
+            clickedUnit is StructureUnit structure &&
+            structure.IsUnderConstruction;
     }
 
     void SelectNewUnit(Unit unit)
