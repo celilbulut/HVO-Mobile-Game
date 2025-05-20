@@ -4,7 +4,9 @@ public class BuildingProcess
 {
     private BuildActionSO m_BuildAction;
     private WorkerUnit m_Worker;
-
+    private float m_ProgressTimer;
+    private bool m_IsFinished;
+    private bool InProgress => HasActiveWorker && m_Worker.CurrentState == UnitState.Building;
     public bool HasActiveWorker => m_Worker != null;
 
     public BuildingProcess(
@@ -26,7 +28,8 @@ public class BuildingProcess
     {
         if (HasActiveWorker)
         {
-            Debug.Log("Building is under construction");
+            m_ProgressTimer += Time.deltaTime;            
+            Debug.Log(m_ProgressTimer);
         }
     }
 
