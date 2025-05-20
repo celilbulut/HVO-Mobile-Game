@@ -17,6 +17,11 @@ public class WorkerUnit : HumanoidUnit
         ResetState();
     }
 
+    public void OnBuildingFinished()
+    {
+        ResetState();
+    }
+
     public void SendToBuild(StructureUnit structure)
     {
         MoveTo(structure.transform.position);
