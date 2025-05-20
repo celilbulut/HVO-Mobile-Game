@@ -2,6 +2,13 @@
 using UnityEngine;
 using UnityEngine.Tilemaps;
 
+public enum ClickType
+{
+    Move,
+    Attack,
+    Build
+}
+
 public class GameManager : SingletonManager<GameManager>
 {
     [Header("Tilemaps")]
@@ -10,9 +17,13 @@ public class GameManager : SingletonManager<GameManager>
     [SerializeField] private Tilemap[] m_UnreachableTilemaps;
 
     [Header("UI")]
-    [SerializeField] private PointToClick m_PointToClickPrefab;
+    [SerializeField] private PointToClick m_PointToMovePrefab; //Click to move yaptik
+    [SerializeField] private PointToClick m_PointToBuildPrefab;
     [SerializeField] private ActionBar m_ActionBar;
     [SerializeField] private ConfirmationBar m_BuildConfirmationBar;
+
+    [Header("Visual Effect (VFX)")]
+    [SerializeField] private ParticleSystem m_ConstructionEffectPrefab;
 
     public Unit ActiveUnit;
     private PlacementProcess m_PlacementProcess;
@@ -31,9 +42,9 @@ public class GameManager : SingletonManager<GameManager>
 
     void Update()
     {
-        if(m_PlacementProcess != null)
+        if (m_PlacementProcess != null)
         {
-            m_PlacementProcess.Update();            
+            m_PlacementProcess.Update();
         }
 
         else if (HvoUtils.TryGetShortClickPosition(out Vector2 inputPos))
@@ -46,19 +57,19 @@ public class GameManager : SingletonManager<GameManager>
     {
         if (m_PlacementProcess != null) return;
 
-        m_PlacementProcess = new PlacementProcess(buildActionSO, 
-                                                  m_WalkableTileMap, 
-                                                  m_OverlayTileMap, 
+        m_PlacementProcess = new PlacementProcess(buildActionSO,
+                                                  m_WalkableTileMap,
+                                                  m_OverlayTileMap,
                                                   m_UnreachableTilemaps);
-                                                  
-        m_PlacementProcess.ShowPlacementOutline();        
+
+        m_PlacementProcess.ShowPlacementOutline();
         m_BuildConfirmationBar.Show(buildActionSO.GoldCost, buildActionSO.WoodCost);
         m_BuildConfirmationBar.SetupHooks(ConfirmBuildPlacement, CancelBuildPlacement);
     }
 
     void DetectClick(Vector2 inputPosition)
     {
-        if(HvoUtils.IsPointerOverUIElement())
+        if (HvoUtils.IsPointerOverUIElement())
         {
             return;
         }
@@ -66,7 +77,7 @@ public class GameManager : SingletonManager<GameManager>
         Vector2 worldPoint = Camera.main.ScreenToWorldPoint(inputPosition);
         RaycastHit2D hit = Physics2D.Raycast(worldPoint, Vector2.zero);
 
-        if(HasClickedOnUnit(hit, out var unit))
+        if (HasClickedOnUnit(hit, out var unit))
         {
             HandleClickOnUnit(unit);
         }
@@ -78,7 +89,7 @@ public class GameManager : SingletonManager<GameManager>
 
     bool HasClickedOnUnit(RaycastHit2D hit, out Unit unit)
     {
-        if(hit.collider != null && hit.collider.TryGetComponent<Unit>(out var clickedUnit))
+        if (hit.collider != null && hit.collider.TryGetComponent<Unit>(out var clickedUnit))
         {
             unit = clickedUnit;
             return true;
@@ -89,29 +100,44 @@ public class GameManager : SingletonManager<GameManager>
 
     void HandleClickOnGround(Vector2 worldPoint)
     {
-        if(HasActiveUnit && IsHumanoid(ActiveUnit))
+        if (HasActiveUnit && IsHumanoid(ActiveUnit))
         {
-            DisplayClickEffect(worldPoint);
+            DisplayClickEffect(worldPoint, ClickType.Move);
             ActiveUnit.MoveTo(worldPoint);
         }
     }
 
     void HandleClickOnUnit(Unit unit)
     {
-        if(HasActiveUnit)
+        if (HasActiveUnit)
         {
-            if(HasClickedOnActiveUnit(unit))
+            if (HasClickedOnActiveUnit(unit))
             {
                 CancelActiveUnit();
                 return;
             }
+            else if (WorkerClickedOnUnfinishedBuilding(unit))
+            {
+                DisplayClickEffect(unit.transform.position, ClickType.Build);
+                ((WorkerUnit)ActiveUnit).SendToBuild(unit as StructureUnit);
+                return;
+            }
         }
+
         SelectNewUnit(unit);
+    }
+
+    bool WorkerClickedOnUnfinishedBuilding(Unit clickedUnit)
+    {
+        return
+            ActiveUnit is WorkerUnit &&
+            clickedUnit is StructureUnit structure &&
+            structure.IsUnderConstruction;
     }
 
     void SelectNewUnit(Unit unit)
     {
-        if(HasActiveUnit)
+        if (HasActiveUnit)
         {
             ActiveUnit.DeSelect();
         }
@@ -139,16 +165,23 @@ public class GameManager : SingletonManager<GameManager>
         ClearActionBarUI();
     }
 
-    void DisplayClickEffect(Vector2 worldPoint)
+    void DisplayClickEffect(Vector2 worldPoint, ClickType clickType)
     {
-        Instantiate(m_PointToClickPrefab, (Vector3)worldPoint, Quaternion.identity);
+        if (clickType == ClickType.Move)
+        {
+            Instantiate(m_PointToMovePrefab, (Vector3)worldPoint, Quaternion.identity);
+        }
+        else if (clickType == ClickType.Build)
+        { 
+            Instantiate(m_PointToBuildPrefab, (Vector3)worldPoint, Quaternion.identity);
+        }        
     }
 
     void ShowUnitActions(Unit unit)
     {
         ClearActionBarUI();
 
-        if(unit.Actions.Length == 0)
+        if (unit.Actions.Length == 0)
         {
             return;
         }
@@ -159,7 +192,7 @@ public class GameManager : SingletonManager<GameManager>
         {
             m_ActionBar.RegisterAction(
                 action.Icon,
-                () => action.Execute(this)            
+                () => action.Execute(this)
             );
         }
     }
@@ -172,17 +205,24 @@ public class GameManager : SingletonManager<GameManager>
 
     void ConfirmBuildPlacement()
     {
-        if(!TryDeductResources(m_PlacementProcess.GoldCost, m_PlacementProcess.WoodCost))
+        if (!TryDeductResources(m_PlacementProcess.GoldCost, m_PlacementProcess.WoodCost))
         {
             Debug.Log("Not Enough Resources!");
             return;
         }
 
-        if(m_PlacementProcess.TryFinalizePlacement(out Vector3 buildPosition))
+        if (m_PlacementProcess.TryFinalizePlacement(out Vector3 buildPosition))
         {
+            DisplayClickEffect(buildPosition, ClickType.Build);
             m_BuildConfirmationBar.Hide();
+
+            new BuildingProcess(m_PlacementProcess.BuildAction,
+                                buildPosition,
+                                (WorkerUnit)ActiveUnit,
+                                m_ConstructionEffectPrefab
+                                );
+
             m_PlacementProcess = null;
-            Debug.Log("Foundations layed out: " + buildPosition);
         }
         else
         {
@@ -205,7 +245,7 @@ public class GameManager : SingletonManager<GameManager>
 
     bool TryDeductResources(int goldCost, int woodCost)
     {
-        if(m_Gold >= goldCost && m_Wood >= woodCost)
+        if (m_Gold >= goldCost && m_Wood >= woodCost)
         {
             m_Gold -= goldCost;
             m_Wood -= woodCost;
@@ -216,7 +256,13 @@ public class GameManager : SingletonManager<GameManager>
 
     void OnGUI()
     {
-        GUI.Label(new Rect(50, 40, 200, 20), "Gold: " + m_Gold.ToString(), new GUIStyle{ fontSize = 50});
-        GUI.Label(new Rect(50, 100, 200, 20), "Wood: " + m_Wood.ToString(), new GUIStyle{ fontSize = 50});
+        GUI.Label(new Rect(50, 40, 200, 20), "Gold: " + m_Gold.ToString(), new GUIStyle { fontSize = 40 });
+        GUI.Label(new Rect(50, 80, 200, 20), "Wood: " + m_Wood.ToString(), new GUIStyle { fontSize = 40 });
+
+        if (ActiveUnit != null)
+        {
+            GUI.Label(new Rect(50, 120, 200, 20), "State: " + ActiveUnit.CurrentState.ToString(), new GUIStyle { fontSize = 40 });
+            GUI.Label(new Rect(50, 160, 200, 20), "Task: " + ActiveUnit.CurrentTask.ToString(), new GUIStyle { fontSize = 40 });
+        }
     }
 }

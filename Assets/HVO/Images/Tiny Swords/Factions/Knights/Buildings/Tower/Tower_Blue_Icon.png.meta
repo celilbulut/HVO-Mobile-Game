@@ -1,5 +1,5 @@
 fileFormatVersion: 2
-guid: 5cefc9c3668a89c48adeaf871e4d1a6e
+guid: 0a4c67647c2abac44a980a5b655443b6
 TextureImporter:
   internalIDToNameTable:
   - first:
@@ -52,7 +52,7 @@ TextureImporter:
   alignment: 0
   spritePivot: {x: 0.5, y: 0.5}
   spritePixelsToUnits: 64
-  spriteBorder: {x: 0, y: 31, z: 0, w: 51}
+  spriteBorder: {x: 7, y: 22, z: 7, w: 51}
   spriteGenerateFallbackPhysicsShape: 1
   alphaUsage: 1
   alphaIsTransparency: 1
@@ -147,15 +147,15 @@ TextureImporter:
         width: 114
         height: 183
       alignment: 0
-      pivot: {x: 0.5, y: 0.5}
+      pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 241d965045ab6b940a63f49fbb3f289b
-      internalID: 1029377445
+      spriteID: 60de1064718fca5498111e2c319ccfad
+      internalID: 312933135
       vertices: []
       indices: 
       edges: []
@@ -174,7 +174,7 @@ TextureImporter:
     spriteCustomMetadata:
       entries: []
     nameFileIdTable:
-      Tower_Blue_Icon_0: 1029377445
+      Tower_Blue_Icon_0: 312933135
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 
