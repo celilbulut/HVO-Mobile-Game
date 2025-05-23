@@ -7,10 +7,8 @@ public class PlacementProcess
     private GameObject m_PlacementOutline;
     private BuildActionSO m_BuildAction;
     private Vector3Int[] m_HighlightPositions;
-    private Tilemap m_WalkableTilemap;
-    private Tilemap m_OverlayTileMap;
-    private Tilemap[] m_UnreachableTileMaps;
     private Sprite m_PlaceholderTileSprite;
+    private TilemapManager m_TilemapManager;
     private Color m_HighlightColor = new Color(0, 0.8f, 1, 0.4f);
     private Color m_BlockedColor = new Color(1f, 0.2f, 0, 0.8f);
 
@@ -18,17 +16,13 @@ public class PlacementProcess
     public int GoldCost => m_BuildAction.GoldCost;
     public int WoodCost => m_BuildAction.WoodCost;
 
-
-    public PlacementProcess(BuildActionSO buildActionSO, 
-                            Tilemap walkableTilemap, 
-                            Tilemap overlayTilemap,
-                            Tilemap[] unreachableTileMaps)                            
+    public PlacementProcess(BuildActionSO buildActionSO,
+                            TilemapManager tilemapManager
+                           )
     {
         m_PlaceholderTileSprite = Resources.Load<Sprite>("Images/PlaceholderTileSprite"); //Yazim onemli.
         m_BuildAction = buildActionSO;
-        m_WalkableTilemap = walkableTilemap;
-        m_OverlayTileMap = overlayTilemap;
-        m_UnreachableTileMaps = unreachableTileMaps;
+        m_TilemapManager = tilemapManager;
     }
 
     public void Update() 
@@ -81,7 +75,7 @@ public class PlacementProcess
     {
         foreach(var tilePosition in m_HighlightPositions)
         {
-            if(!CanPlaceTile(tilePosition)) return false;
+            if(!m_TilemapManager.CanPlaceTile(tilePosition)) return false;
         }
 
         return true;
@@ -113,16 +107,17 @@ public class PlacementProcess
             var tile = ScriptableObject.CreateInstance<Tile>();
             tile.sprite = m_PlaceholderTileSprite;
 
-            if(CanPlaceTile(tilePosition))
+            if (m_TilemapManager.CanPlaceTile(tilePosition))
             {
                 tile.color = m_HighlightColor;
             }
             else
             {
-                tile.color = m_BlockedColor;                
+                tile.color = m_BlockedColor;
             }
 
-            m_OverlayTileMap.SetTile(tilePosition, tile);            
+            m_TilemapManager.SetTileOverlay(tilePosition, tile);
+            
         }
     }
 
@@ -132,40 +127,8 @@ public class PlacementProcess
 
         foreach(var tilePosition in m_HighlightPositions)
         {
-            m_OverlayTileMap.SetTile(tilePosition, null);
+            m_TilemapManager.SetTileOverlay(tilePosition, null);
         }
         m_HighlightPositions = null;
-    }
-
-    bool CanPlaceTile(Vector3Int tilePosition)
-    {
-        return m_WalkableTilemap.HasTile(tilePosition) && !IsInUnreachableTilemap(tilePosition) && !IsBlockedByGameObject(tilePosition);
-    }
-
-    bool IsInUnreachableTilemap(Vector3Int tilePosition)
-    {
-        foreach(var tilemap in m_UnreachableTileMaps)
-        {
-            if(tilemap.HasTile(tilePosition)) return true;
-        }
-
-        return false;
-    }
-
-    bool IsBlockedByGameObject(Vector3Int tilePosition)
-    {
-        Vector3 tileSize = m_WalkableTilemap.cellSize;
-        Collider2D[] colliders = Physics2D.OverlapBoxAll(tilePosition + tileSize / 2, tileSize * 0.5f, 0);
-
-        foreach(var collider in colliders)
-        {
-            var layer = collider.gameObject.layer;
-            if(layer == LayerMask.NameToLayer("Player"))
-            {
-                return true;
-            }
-        }
-        
-        return false;
     }
 }
