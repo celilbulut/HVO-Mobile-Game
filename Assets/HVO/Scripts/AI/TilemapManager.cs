@@ -8,14 +8,11 @@ public class TilemapManager : SingletonManager<TilemapManager>
     [SerializeField] private Tilemap m_OverlayTileMap;
     [SerializeField] private Tilemap[] m_UnreachableTilemaps;
     private Pathfinding m_Pathfinding;
+    public Tilemap PathfindingTilemap => m_WalkableTilemap;
 
     void Start()
     {
-        var bounds = m_WalkableTilemap.cellBounds;
-        int width = bounds.size.x;
-        int height = bounds.size.y;
-
-        m_Pathfinding = new Pathfinding(width, height);
+        m_Pathfinding = new Pathfinding(this);
     }
 
     public bool CanPlaceTile(Vector3Int tilePosition)
