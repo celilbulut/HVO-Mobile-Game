@@ -11,11 +11,6 @@ public enum ClickType
 
 public class GameManager : SingletonManager<GameManager>
 {
-    [Header("Tilemaps")]
-    [SerializeField] private Tilemap m_WalkableTileMap;
-    [SerializeField] private Tilemap m_OverlayTileMap;
-    [SerializeField] private Tilemap[] m_UnreachableTilemaps;
-
     [Header("UI")]
     [SerializeField] private PointToClick m_PointToMovePrefab; //Click to move yaptik
     [SerializeField] private PointToClick m_PointToBuildPrefab;
@@ -57,10 +52,11 @@ public class GameManager : SingletonManager<GameManager>
     {
         if (m_PlacementProcess != null) return;
 
+        var tilemapManager = TilemapManager.Get();
+
         m_PlacementProcess = new PlacementProcess(buildActionSO,
-                                                  m_WalkableTileMap,
-                                                  m_OverlayTileMap,
-                                                  m_UnreachableTilemaps);
+                                                  tilemapManager
+                                                 );
 
         m_PlacementProcess.ShowPlacementOutline();
         m_BuildConfirmationBar.Show(buildActionSO.GoldCost, buildActionSO.WoodCost);
@@ -172,9 +168,9 @@ public class GameManager : SingletonManager<GameManager>
             Instantiate(m_PointToMovePrefab, (Vector3)worldPoint, Quaternion.identity);
         }
         else if (clickType == ClickType.Build)
-        { 
+        {
             Instantiate(m_PointToBuildPrefab, (Vector3)worldPoint, Quaternion.identity);
-        }        
+        }
     }
 
     void ShowUnitActions(Unit unit)
