@@ -15,6 +15,11 @@ public class TilemapManager : SingletonManager<TilemapManager>
         m_Pathfinding = new Pathfinding(this);
     }
 
+    public bool CanWalkAtTile(Vector3Int tilePosition)
+    {
+        return m_WalkableTilemap.HasTile(tilePosition) && !IsInUnreachableTilemap(tilePosition);
+    }
+
     public bool CanPlaceTile(Vector3Int tilePosition)
     {
         return m_WalkableTilemap.HasTile(tilePosition) && !IsInUnreachableTilemap(tilePosition) && !IsBlockedByGameObject(tilePosition);
