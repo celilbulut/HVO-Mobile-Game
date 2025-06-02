@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 
 public class Pathfinding
@@ -44,8 +45,51 @@ public class Pathfinding
         Node startNode = FindNode(startPosition);
         Node endNode = FindNode(endPosition);
 
-        Debug.Log("Start Node: " + startNode);
-        Debug.Log("End Node: " + endNode);
+        if (startNode == null || endNode == null)
+        {
+            Debug.Log("Cannot find the path!");
+            return;
+        }
+
+        List<Node> openList = new();
+        HashSet<Node> closedList = new();
+
+        openList.Add(startNode);
+
+        while (openList.Count > 0)
+        {
+            Node currentNode = GetLowestFCostNode(openList);
+
+            if (currentNode == endNode)
+            {
+                Debug.Log("Path Found!");
+                return;
+            }
+            
+            openList.Remove(currentNode);
+            closedList.Add(currentNode);
+
+            Debug.Log("OL: " + string.Join(", ", openList));
+            Debug.Log("OL: " + string.Join(", ", closedList));
+        }
+    }
+
+    Node GetLowestFCostNode(List<Node> openList)
+    {
+        Node lowestFCostNode = openList[0];
+
+        foreach (Node node in openList)
+        {
+            if (
+                node.fCost < lowestFCostNode.fCost ||
+                (node.fCost == lowestFCostNode.fCost && node.hCost < lowestFCostNode.hCost)
+              )
+            {
+                lowestFCostNode = node;
+            }
+        }
+
+        return lowestFCostNode;
     }
 
     Node FindNode(Vector3 position)
