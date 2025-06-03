@@ -41,7 +41,7 @@ public class Pathfinding
         }
     }
 
-    public void FindPath(Vector3 startPosition, Vector3 endPosition)
+    public List<Node> FindPath(Vector3 startPosition, Vector3 endPosition)
     {
         Node startNode = FindNode(startPosition);
         Node endNode = FindNode(endPosition);
@@ -49,7 +49,7 @@ public class Pathfinding
         if (startNode == null || endNode == null)
         {
             Debug.Log("Cannot find the path!");
-            return;
+            return new List<Node>();
         }
 
         List<Node> openList = new();
@@ -63,8 +63,9 @@ public class Pathfinding
 
             if (currentNode == endNode)
             {
-                Debug.Log("CL: " + string.Join(", ", closedList));
-                return;
+                var path = RetracePath(startNode, endNode);
+                Debug.Log("path: " + string.Join(", ", path));
+                return path;
             }
 
             openList.Remove(currentNode);
@@ -90,8 +91,24 @@ public class Pathfinding
                 }
             }
         }
+        return new List<Node>();
+    }
 
-        Debug.Log("No path found!");
+    List<Node> RetracePath(Node startNode, Node endNode)
+    {
+        List<Node> path = new();
+        Node currentNode = endNode;
+
+        while (currentNode != startNode)
+        {
+            path.Add(currentNode);
+            currentNode = currentNode.parent;
+        }
+
+        path.Add(startNode);
+        path.Reverse();
+
+        return path;
     }
 
     /*
@@ -172,7 +189,7 @@ public class Pathfinding
         {
             return m_Grid[gridX, gridY];
         }
-        
+
         Debug.Log($"Node not found at position: {position}");
         return null;
     }
