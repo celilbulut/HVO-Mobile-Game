@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using UnityEditor.Experimental.GraphView;
 using UnityEngine;
 
 public class Pathfinding
@@ -62,23 +63,60 @@ public class Pathfinding
 
             if (currentNode == endNode)
             {
-                Debug.Log("Path Found!");
+                Debug.Log("CL: " + string.Join(", ", closedList));
                 return;
             }
 
             openList.Remove(currentNode);
             closedList.Add(currentNode);
 
-            Debug.Log("OL: " + string.Join(", ", openList));
-            Debug.Log("OL: " + string.Join(", ", closedList));
+            foreach (Node neighbor in GetNeighbors(currentNode))
+            {
+                if (!neighbor.isWalkable || closedList.Contains(neighbor)) continue;
 
-            var neighbors = GetNeigbors(currentNode);
+                float tentativeG = currentNode.gCost + GetDistance(currentNode, neighbor);
 
-            Debug.Log("neighbors: " + string.Join(", ", neighbors));
+                if (tentativeG < neighbor.gCost || !openList.Contains(neighbor))
+                {
+                    neighbor.gCost = tentativeG;
+                    neighbor.hCost = GetDistance(neighbor, endNode);
+                    neighbor.fCost = neighbor.gCost + neighbor.hCost;
+                    neighbor.parent = currentNode;
+
+                    if (!openList.Contains(neighbor))
+                    {
+                        openList.Add(neighbor);
+                    }
+                }
+            }
         }
+
+        Debug.Log("No path found!");
     }
 
-    List<Node> GetNeigbors(Node node)
+    /*
+    Manhattan Distance -> d = |x1 - x2| + |y1 - y2|
+    dstX = |x1 - x2|
+    dstY = |y1 - y2|
+    Eğer dx > dy:
+    H = 14 × dy + 10 × (dx - dy)    
+    Aksi takdirde:
+    H = 14 × dx + 10 × (dy - dx)
+    */
+    float GetDistance(Node nodeA, Node nodeB)
+    {
+        int dstX = Mathf.Abs(nodeA.x - nodeB.x);
+        int dstY = Mathf.Abs(nodeA.y - nodeB.y);
+
+        if (dstX > dstY)
+        {
+            return 14 * dstY + 10 * (dstX - dstY);
+        }
+
+        return 14 * dstX + 10 * (dstY - dstX);
+    }
+
+    List<Node> GetNeighbors(Node node)
     {
         List<Node> neighbors = new();
 
@@ -134,7 +172,7 @@ public class Pathfinding
         {
             return m_Grid[gridX, gridY];
         }
-
+        
         Debug.Log($"Node not found at position: {position}");
         return null;
     }
