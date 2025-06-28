@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 
 public class AIPawn : MonoBehaviour
@@ -5,12 +6,14 @@ public class AIPawn : MonoBehaviour
     [SerializeField] private float m_Speed = 5f;
     
     private Vector3? m_Destination;
+    private TilemapManager m_TilemapManager;
+    private List<Node> m_CurrentPath;
     public Vector3? Destination => m_Destination;
 
-    //void Start()
-    //{
-    //  SetDestination(new Vector3(0, 0, 0));
-    //}
+    void Start() // Ekrana tiklama yaptigimiz yer
+    {
+        m_TilemapManager = TilemapManager.Get();
+    }
 
     void Update()
     {
@@ -28,8 +31,10 @@ public class AIPawn : MonoBehaviour
         }
     }
 
-    public void SetDestination(Vector3 destination)
+    public void SetDestination(Vector3 destination) // Ekrana tiklama yaptigimiz yer
     {
+        m_CurrentPath = m_TilemapManager.FindPath(transform.position, destination);
+        Debug.Log("Path: " + string.Join(", ", m_CurrentPath));
         m_Destination = destination;   
     }
 }
