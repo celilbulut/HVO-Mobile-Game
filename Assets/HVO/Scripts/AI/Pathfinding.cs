@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+using UnityEditor.Experimental.GraphView;
 using UnityEngine;
 
 public class Pathfinding
@@ -39,13 +41,141 @@ public class Pathfinding
         }
     }
 
-    public void FindPath(Vector3 startPosition, Vector3 endPosition)
+    public List<Node> FindPath(Vector3 startPosition, Vector3 endPosition)
     {
         Node startNode = FindNode(startPosition);
         Node endNode = FindNode(endPosition);
 
-        Debug.Log("Start Node: " + startNode);
-        Debug.Log("End Node: " + endNode);
+        if (startNode == null || endNode == null)
+        {
+            Debug.Log("Cannot find the path!");
+            return new List<Node>();
+        }
+
+        List<Node> openList = new();
+        HashSet<Node> closedList = new();
+
+        openList.Add(startNode);
+
+        while (openList.Count > 0)
+        {
+            Node currentNode = GetLowestFCostNode(openList);
+
+            if (currentNode == endNode)
+            {
+                var path = RetracePath(startNode, endNode);
+                Debug.Log("path: " + string.Join(", ", path));
+                return path;
+            }
+
+            openList.Remove(currentNode);
+            closedList.Add(currentNode);
+
+            foreach (Node neighbor in GetNeighbors(currentNode))
+            {
+                if (!neighbor.isWalkable || closedList.Contains(neighbor)) continue;
+
+                float tentativeG = currentNode.gCost + GetDistance(currentNode, neighbor);
+
+                if (tentativeG < neighbor.gCost || !openList.Contains(neighbor))
+                {
+                    neighbor.gCost = tentativeG;
+                    neighbor.hCost = GetDistance(neighbor, endNode);
+                    neighbor.fCost = neighbor.gCost + neighbor.hCost;
+                    neighbor.parent = currentNode;
+
+                    if (!openList.Contains(neighbor))
+                    {
+                        openList.Add(neighbor);
+                    }
+                }
+            }
+        }
+        return new List<Node>();
+    }
+
+    List<Node> RetracePath(Node startNode, Node endNode)
+    {
+        List<Node> path = new();
+        Node currentNode = endNode;
+
+        while (currentNode != startNode)
+        {
+            path.Add(currentNode);
+            currentNode = currentNode.parent;
+        }
+
+        path.Add(startNode);
+        path.Reverse();
+
+        return path;
+    }
+
+    /*
+    Manhattan Distance -> d = |x1 - x2| + |y1 - y2|
+    dstX = |x1 - x2|
+    dstY = |y1 - y2|
+    Eğer dx > dy:
+    H = 14 × dy + 10 × (dx - dy)    
+    Aksi takdirde:
+    H = 14 × dx + 10 × (dy - dx)
+    */
+    float GetDistance(Node nodeA, Node nodeB)
+    {
+        int dstX = Mathf.Abs(nodeA.x - nodeB.x);
+        int dstY = Mathf.Abs(nodeA.y - nodeB.y);
+
+        if (dstX > dstY)
+        {
+            return 14 * dstY + 10 * (dstX - dstY);
+        }
+
+        return 14 * dstX + 10 * (dstY - dstX);
+    }
+
+    List<Node> GetNeighbors(Node node)
+    {
+        List<Node> neighbors = new();
+
+        for (int x = -1; x <= 1; x++)
+        {
+            for (int y = -1; y <= 1; y++)
+            {
+                if (x == 0 && y == 0)
+                {
+                    continue;
+                }
+
+                int checkX = node.x + x - m_GridOffset.x;
+                int checkY = node.y + y - m_GridOffset.y;
+
+                if (checkX >= 0 && checkX < m_Width && checkY >= 0 && checkY < m_Height)
+                {
+                    var neighbor = m_Grid[checkX, checkY];
+                    if (!neighbor.isWalkable) continue;
+                    neighbors.Add(neighbor);
+                }
+            }
+        }
+        return neighbors;
+    }
+
+    Node GetLowestFCostNode(List<Node> openList)
+    {
+        Node lowestFCostNode = openList[0];
+
+        foreach (Node node in openList)
+        {
+            if (
+                node.fCost < lowestFCostNode.fCost ||
+                (node.fCost == lowestFCostNode.fCost && node.hCost < lowestFCostNode.hCost)
+              )
+            {
+                lowestFCostNode = node;
+            }
+        }
+
+        return lowestFCostNode;
     }
 
     Node FindNode(Vector3 position)
