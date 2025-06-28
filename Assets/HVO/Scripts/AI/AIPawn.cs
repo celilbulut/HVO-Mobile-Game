@@ -1,15 +1,14 @@
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 public class AIPawn : MonoBehaviour
 {
     [SerializeField] private float m_Speed = 5f;
 
-    private Vector3? m_Destination;
     private TilemapManager m_TilemapManager;
     private List<Node> m_CurrentPath = new();
     private int m_CurrentNodeIndex;
-    public Vector3? Destination => m_Destination;
 
     void Start() // Ekrana tiklama yaptigimiz yer
     {
@@ -20,7 +19,6 @@ public class AIPawn : MonoBehaviour
     {
         if (!IsPathValid())
         {
-            m_Destination = null;
             return;
         }
         Node currentNode = m_CurrentPath[m_CurrentNodeIndex];
@@ -31,15 +29,30 @@ public class AIPawn : MonoBehaviour
 
         if (Vector3.Distance(transform.position, targetPosition) <= 0.15f)
         {
-            m_CurrentNodeIndex++;
+            if (m_CurrentNodeIndex == m_CurrentPath.Count - 1)
+            {
+                Debug.Log("Destination Reached!");
+                m_CurrentPath = new();
+            }
+            else
+            {
+                m_CurrentNodeIndex++;                
+            }
         }
     }
 
     public void SetDestination(Vector3 destination) // Ekrana tiklama yaptigimiz yer
     {
+        if (m_CurrentPath.Count > 0)
+        {
+            Node newEndNode = m_TilemapManager.FindNode(destination); 
+            if (newEndNode == m_CurrentPath[^1]) // son nodu veriyor. m_CurrentPath.Last() ile ayni
+            {
+                return;
+            }
+        }
+
         m_CurrentPath = m_TilemapManager.FindPath(transform.position, destination);
-        Debug.Log("Path: " + string.Join(", ", m_CurrentPath));
-        m_Destination = destination;
         m_CurrentNodeIndex = 0;
     }
 
