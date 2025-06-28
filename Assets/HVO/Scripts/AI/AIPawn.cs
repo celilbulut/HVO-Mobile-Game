@@ -4,10 +4,11 @@ using UnityEngine;
 public class AIPawn : MonoBehaviour
 {
     [SerializeField] private float m_Speed = 5f;
-    
+
     private Vector3? m_Destination;
     private TilemapManager m_TilemapManager;
-    private List<Node> m_CurrentPath;
+    private List<Node> m_CurrentPath = new();
+    private int m_CurrentNodeIndex;
     public Vector3? Destination => m_Destination;
 
     void Start() // Ekrana tiklama yaptigimiz yer
@@ -17,17 +18,20 @@ public class AIPawn : MonoBehaviour
 
     void Update()
     {
-        if (m_Destination.HasValue)
+        if (!IsPathValid())
         {
-            var dir = m_Destination.Value - transform.position;
-            transform.position += dir.normalized * Time.deltaTime * m_Speed;
+            m_Destination = null;
+            return;
+        }
+        Node currentNode = m_CurrentPath[m_CurrentNodeIndex];
+        Vector3 targetPosition = new Vector3(currentNode.centerX, currentNode.centerY);
+        Vector3 direction = (targetPosition - transform.position).normalized;
 
-            var distanceToDestination = Vector3.Distance(transform.position, m_Destination.Value);
+        transform.position += direction * m_Speed * Time.deltaTime;
 
-            if (distanceToDestination < 0.1f)
-            {
-                m_Destination = null;
-            } 
+        if (Vector3.Distance(transform.position, targetPosition) <= 0.15f)
+        {
+            m_CurrentNodeIndex++;
         }
     }
 
@@ -35,6 +39,12 @@ public class AIPawn : MonoBehaviour
     {
         m_CurrentPath = m_TilemapManager.FindPath(transform.position, destination);
         Debug.Log("Path: " + string.Join(", ", m_CurrentPath));
-        m_Destination = destination;   
+        m_Destination = destination;
+        m_CurrentNodeIndex = 0;
+    }
+
+    bool IsPathValid()
+    {
+        return m_CurrentPath.Count > 0 && m_CurrentNodeIndex < m_CurrentPath.Count;
     }
 }
