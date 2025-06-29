@@ -27,6 +27,11 @@ public class TilemapManager : SingletonManager<TilemapManager>
         return m_Pathfinding.FindNode(position);
     }
 
+    public void UpdateNodesInArea(Vector3Int startPosition, int width, int height)
+    {
+        m_Pathfinding.UpdateNodesInArea(startPosition, width, height);
+    }
+
     public bool CanWalkAtTile(Vector3Int tilePosition)
     {
         return m_WalkableTilemap.HasTile(tilePosition) && !IsInUnreachableTilemap(tilePosition) && !IsBlockedByBuilding(tilePosition);
