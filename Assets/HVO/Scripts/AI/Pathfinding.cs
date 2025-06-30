@@ -72,6 +72,9 @@ public class Pathfinding
 
         openList.Add(startNode);
 
+        Node closestNode = startNode;
+        var closestDistanceToEnd = GetDistance(closestNode, endNode);
+
         while (openList.Count > 0)
         {
             Node currentNode = GetLowestFCostNode(openList);
@@ -94,21 +97,30 @@ public class Pathfinding
 
                 if (tentativeG < neighbor.gCost || !openList.Contains(neighbor))
                 {
+                    var distance = GetDistance(neighbor, endNode);
+
                     neighbor.gCost = tentativeG;
                     neighbor.hCost = GetDistance(neighbor, endNode);
                     neighbor.fCost = neighbor.gCost + neighbor.hCost;
                     neighbor.parent = currentNode;
 
-                    if (!openList.Contains(neighbor))
+                    if (distance < closestDistanceToEnd)
                     {
-                        openList.Add(neighbor);
+                        closestNode = neighbor;
+                        closestDistanceToEnd = distance;
                     }
+
+                    if (!openList.Contains(neighbor))
+                        {
+                            openList.Add(neighbor);
+                        }
                 }
             }
         }
 
+        var unfinishedPath = RetracePath(startNode, closestNode, startPosition);
         ResetNodes(openList, closedList);
-        return new List<Vector3>();
+        return unfinishedPath;
     }
 
     public void UpdateNodesInArea(Vector3Int startPosition, int width, int height)
