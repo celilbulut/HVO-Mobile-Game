@@ -1,9 +1,12 @@
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Events;
 
 public class AIPawn : MonoBehaviour
 {
     [SerializeField] private float m_Speed = 5f;
+
+    public UnityAction<Vector3> OnNewPositionSelected = delegate { };
 
     private TilemapManager m_TilemapManager;
     private List<Vector3> m_CurrentPath = new();
@@ -36,7 +39,9 @@ public class AIPawn : MonoBehaviour
             }
             else
             {
-                m_CurrentNodeIndex++;                
+                m_CurrentNodeIndex++;
+                
+                OnNewPositionSelected.Invoke(m_CurrentPath[m_CurrentNodeIndex]);
             }
         }
     }
@@ -57,6 +62,9 @@ public class AIPawn : MonoBehaviour
 
         m_CurrentPath = m_TilemapManager.FindPath(transform.position, destination);
         m_CurrentNodeIndex = 0;
+
+        OnNewPositionSelected.Invoke(m_CurrentPath[m_CurrentNodeIndex]);
+
     }
 
     bool IsPathValid()
