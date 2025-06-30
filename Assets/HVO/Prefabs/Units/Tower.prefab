@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 7451627070855808622}
   - component: {fileID: 5393380527900757263}
   - component: {fileID: 7257481111884665488}
-  m_Layer: 6
+  m_Layer: 7
   m_Name: Tower
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -139,5 +139,5 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Actions: []
-  IsMoving: 0
+  m_ObjectDetectionRadius: 3
   IsTarget: 0

@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using UnityEditor.Experimental.GraphView;
 using UnityEngine;
 
 public class Pathfinding
@@ -41,7 +40,23 @@ public class Pathfinding
         }
     }
 
-    public List<Node> FindPath(Vector3 startPosition, Vector3 endPosition)
+    public Node FindNode(Vector3 position)
+    {
+        Vector3Int flooredPosition = new Vector3Int(Mathf.FloorToInt(position.x), Mathf.FloorToInt(position.y));
+
+        int gridX = flooredPosition.x - m_GridOffset.x;
+        int gridY = flooredPosition.y - m_GridOffset.y;
+
+        if (gridX >= 0 && gridX < m_Width && gridY >= 0 && gridY < m_Height)
+        {
+            return m_Grid[gridX, gridY];
+        }
+
+        Debug.Log($"Node not found at position: {position}");
+        return null;
+    }
+
+    public List<Vector3> FindPath(Vector3 startPosition, Vector3 endPosition)
     {
         Node startNode = FindNode(startPosition);
         Node endNode = FindNode(endPosition);
@@ -49,7 +64,7 @@ public class Pathfinding
         if (startNode == null || endNode == null)
         {
             Debug.Log("Cannot find the path!");
-            return new List<Node>();
+            return new List<Vector3>();
         }
 
         List<Node> openList = new();
@@ -57,14 +72,17 @@ public class Pathfinding
 
         openList.Add(startNode);
 
+        Node closestNode = startNode;
+        var closestDistanceToEnd = GetDistance(closestNode, endNode);
+
         while (openList.Count > 0)
         {
             Node currentNode = GetLowestFCostNode(openList);
 
             if (currentNode == endNode)
             {
-                var path = RetracePath(startNode, endNode);
-                Debug.Log("path: " + string.Join(", ", path));
+                var path = RetracePath(startNode, endNode, startPosition);
+                ResetNodes(openList, closedList);
                 return path;
             }
 
@@ -79,33 +97,85 @@ public class Pathfinding
 
                 if (tentativeG < neighbor.gCost || !openList.Contains(neighbor))
                 {
+                    var distance = GetDistance(neighbor, endNode);
+
                     neighbor.gCost = tentativeG;
                     neighbor.hCost = GetDistance(neighbor, endNode);
                     neighbor.fCost = neighbor.gCost + neighbor.hCost;
                     neighbor.parent = currentNode;
 
-                    if (!openList.Contains(neighbor))
+                    if (distance < closestDistanceToEnd)
                     {
-                        openList.Add(neighbor);
+                        closestNode = neighbor;
+                        closestDistanceToEnd = distance;
                     }
+
+                    if (!openList.Contains(neighbor))
+                        {
+                            openList.Add(neighbor);
+                        }
                 }
             }
         }
-        return new List<Node>();
+
+        var unfinishedPath = RetracePath(startNode, closestNode, startPosition);
+        ResetNodes(openList, closedList);
+        return unfinishedPath;
     }
 
-    List<Node> RetracePath(Node startNode, Node endNode)
+    public void UpdateNodesInArea(Vector3Int startPosition, int width, int height)
     {
-        List<Node> path = new();
+        for (int x = 0; x < width; x++)
+        {
+            for (int y = 0; y < height; y++)
+            {
+                int xPosition = startPosition.x + x;
+                int yPosition = startPosition.y + y;
+
+                int gridX = xPosition - m_GridOffset.x;
+                int gridY = yPosition - m_GridOffset.y;
+
+                if (gridX >= 0 && gridX < m_Width && gridY >= 0 && gridY < m_Height)
+                {
+                    Node node = m_Grid[gridX, gridY];
+                    Vector3Int cellPosition = new Vector3Int(node.x, node.y, 0);
+                    node.isWalkable = m_TilemapManager.CanWalkAtTile(cellPosition);
+                }
+            }
+        }
+    }
+
+    void ResetNodes(List<Node> openList, HashSet<Node> closedList)
+    {
+        foreach (Node node in openList)
+        {
+            node.gCost = 0;
+            node.hCost = 0;
+            node.parent = null;
+        }
+        foreach (Node node in closedList)
+        {
+            node.gCost = 0;
+            node.hCost = 0;
+            node.parent = null;
+        }
+
+        openList.Clear();
+        closedList.Clear();
+    }
+
+    List<Vector3> RetracePath(Node startNode, Node endNode, Vector3 startPosition)
+    {
+        List<Vector3> path = new();
         Node currentNode = endNode;
 
         while (currentNode != startNode)
         {
-            path.Add(currentNode);
+            path.Add(new Vector3(currentNode.centerX, currentNode.centerY));
             currentNode = currentNode.parent;
         }
 
-        path.Add(startNode);
+        path.Add(startPosition);
         path.Reverse();
 
         return path;
@@ -176,21 +246,5 @@ public class Pathfinding
         }
 
         return lowestFCostNode;
-    }
-
-    Node FindNode(Vector3 position)
-    {
-        Vector3Int flooredPosition = new Vector3Int(Mathf.FloorToInt(position.x), Mathf.FloorToInt(position.y));
-
-        int gridX = flooredPosition.x - m_GridOffset.x;
-        int gridY = flooredPosition.y - m_GridOffset.y;
-
-        if (gridX >= 0 && gridX < m_Width && gridY >= 0 && gridY < m_Height)
-        {
-            return m_Grid[gridX, gridY];
-        }
-
-        Debug.Log($"Node not found at position: {position}");
-        return null;
     }
 }
