@@ -44,7 +44,7 @@ public class GameManager : SingletonManager<GameManager>
     void Update()
     {
         m_CameraController.Update();
-        
+
         if (m_PlacementProcess != null)
         {
             m_PlacementProcess.Update();
@@ -69,6 +69,7 @@ public class GameManager : SingletonManager<GameManager>
         m_PlacementProcess.ShowPlacementOutline();
         m_BuildConfirmationBar.Show(buildActionSO.GoldCost, buildActionSO.WoodCost);
         m_BuildConfirmationBar.SetupHooks(ConfirmBuildPlacement, CancelBuildPlacement);
+        m_CameraController.LockCamera = true;
     }
 
     void DetectClick(Vector2 inputPosition)
@@ -227,6 +228,7 @@ public class GameManager : SingletonManager<GameManager>
                                 );
 
             m_PlacementProcess = null;
+            m_CameraController.LockCamera = false;
         }
         else
         {
@@ -245,6 +247,7 @@ public class GameManager : SingletonManager<GameManager>
         m_BuildConfirmationBar.Hide();
         m_PlacementProcess.Cleanup();
         m_PlacementProcess = null;
+        m_CameraController.LockCamera = false;
     }
 
     bool TryDeductResources(int goldCost, int woodCost)

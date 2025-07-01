@@ -8,6 +8,7 @@ public class CameraController
 {
     private float m_PanSpeed; // Masaüstü cihazlar için pan (kaydırma) hızı
     private float m_MobilePanSpeed; // Mobil cihazlar için pan hızı
+    public bool LockCamera { get; set; }
 
     public CameraController(float panSpeed, float mobilePanSpeed)
     {
@@ -20,6 +21,8 @@ public class CameraController
     /// </summary>
     public void Update()
     {
+        if (LockCamera) return;
+
         // Mobil cihazda tek parmakla ekran üzerinde hareket varsa
         if (Input.touchCount == 1 && Input.GetTouch(0).phase == TouchPhase.Moved)
         {
@@ -42,8 +45,8 @@ public class CameraController
 
             // Kamerayı mouse hareketine göre kaydır (delta pozisyon, zamanla çarpılarak smooth hale getirilir)
             Camera.main.transform.Translate(
-                mouseDeltaPosition.x * Time.deltaTime * m_PanSpeed,
-                mouseDeltaPosition.y * Time.deltaTime * m_PanSpeed,
+                -mouseDeltaPosition.x * Time.deltaTime * m_PanSpeed,
+                -mouseDeltaPosition.y * Time.deltaTime * m_PanSpeed,
                 0
             );
         }
