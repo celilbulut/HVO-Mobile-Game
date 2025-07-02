@@ -37,8 +37,10 @@ public abstract class Unit : MonoBehaviour
     public UnitTask CurrentTask { get; protected set; } = UnitTask.None;
     public Unit Target {get; protected set;}
 
-    public bool HasTarget => Target != null;
+    public virtual bool IsPlayer => true;
+    public virtual bool IsBuilding => false;
 
+    public bool HasTarget => Target != null;
 
     protected void Awake()
     {
