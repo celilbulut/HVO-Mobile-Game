@@ -9,8 +9,9 @@ public class HumanoidUnit : Unit
     protected float m_SmoothedSpeed;
     public float CurrentSpeed => m_Velocity.magnitude;
 
-    void Start()
+    protected override void Start()
     {
+        base.Start();
         m_LastPosition = transform.position;
     }
 

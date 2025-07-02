@@ -55,27 +55,27 @@ public class TilemapManager : SingletonManager<TilemapManager>
     public bool IsBlockedByBuilding(Vector3Int tilePosition)
     {
         Vector3 worldPosition = m_WalkableTilemap.CellToWorld(tilePosition) + m_WalkableTilemap.cellSize / 2;
-        int buildingLayerMask = 1 << LayerMask.NameToLayer("Building"); // Building layerina kadar kaydirma yapmak.
+        int unitMask = 1 << LayerMask.NameToLayer("Unit"); // Unit layerina kadar kaydirma yapmak.
 
-        Collider2D[] collider = Physics2D.OverlapPointAll(worldPosition, buildingLayerMask);
-        return collider.Length > 0;
+        Collider2D[] colliders = Physics2D.OverlapPointAll(worldPosition, unitMask);
+
+        foreach (var collider in colliders)
+        {
+            if (collider.CompareTag("Building"))
+            {
+                return true;
+            }
+        }
+        return false;
     }
 
     public bool IsBlockedByGameObject(Vector3Int tilePosition)
     {
         Vector3 tileSize = m_WalkableTilemap.cellSize;
-        Collider2D[] colliders = Physics2D.OverlapBoxAll(tilePosition + tileSize / 2, tileSize * 0.5f, 0);
+        int unitMask = 1 << LayerMask.NameToLayer("Unit");
+        Collider2D[] colliders = Physics2D.OverlapBoxAll(tilePosition + tileSize / 2, tileSize * 0.5f, 0, unitMask);
 
-        foreach (var collider in colliders)
-        {
-            var layer = collider.gameObject.layer;
-            if (layer == LayerMask.NameToLayer("Player") || layer == LayerMask.NameToLayer("Building"))
-            {
-                return true;
-            }
-        }
-
-        return false;
+        return colliders.Length > 0;
     }
 
     public void SetTileOverlay(Vector3Int tilePosition, Tile tile)

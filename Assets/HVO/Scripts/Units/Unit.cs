@@ -22,13 +22,16 @@ public abstract class Unit : MonoBehaviour
 {
     [SerializeField] private ActionSO[] m_Actions;
     [SerializeField] protected float m_ObjectDetectionRadius = 3f;
+    [SerializeField] protected float m_UnitDetectionCheckRate = 0.5f;
 
     public bool IsTarget;
+    protected GameManager m_GameManager;
     protected Animator m_Animator;
     protected AIPawn m_AIPawn;
     protected SpriteRenderer m_SpriteRenderer;
     protected Material m_OriginalMaterial;
     protected Material m_HighlightMaterial;
+    protected float m_NextUnitDetectionTime;
 
     public ActionSO[] Actions => m_Actions;
     public SpriteRenderer Renderer => m_SpriteRenderer;
@@ -37,8 +40,15 @@ public abstract class Unit : MonoBehaviour
     public UnitTask CurrentTask { get; protected set; } = UnitTask.None;
     public Unit Target {get; protected set;}
 
+    public virtual bool IsPlayer => true;
+    public virtual bool IsBuilding => false;
+
     public bool HasTarget => Target != null;
 
+    protected virtual void Start()
+    {
+        RegisterUnit();
+    }
 
     protected void Awake()
     {
@@ -53,6 +63,7 @@ public abstract class Unit : MonoBehaviour
             m_AIPawn.OnNewPositionSelected += TurnToPosition;
         }
 
+        m_GameManager = GameManager.Get();
         m_SpriteRenderer = GetComponent<SpriteRenderer>();
         m_OriginalMaterial = m_SpriteRenderer.material;
         m_HighlightMaterial = Resources.Load<Material>("Materials/Outline");
@@ -61,9 +72,11 @@ public abstract class Unit : MonoBehaviour
     void OnDestroy()
     {
         if (m_AIPawn != null)
-        { 
+        {
             m_AIPawn.OnNewPositionSelected -= TurnToPosition;
         }
+
+        UnRegisterUnit();
     }
 
     public void SetTask(UnitTask task)
@@ -115,6 +128,37 @@ public abstract class Unit : MonoBehaviour
     protected virtual void OnSetState(UnitState oldState, UnitState newState)
     {
         CurrentState = newState;
+    }
+
+    public virtual void RegisterUnit()
+    {
+        m_GameManager.RegisterUnit(this);
+    }
+
+    public virtual void UnRegisterUnit()
+    {
+        m_GameManager.UnRegisterUnit(this);
+    }
+
+    protected virtual bool TryFindClosestFoe(out Unit foe)
+    {
+        if (Time.time >= m_NextUnitDetectionTime)
+        {
+            // Hedef tespiti yapılır
+            // En yakın düşman GameManager.FindClosestUnit ile bulunur
+            // Eğer bulunduysa out parametresine atanır
+            // m_NextUnitDetectionTime güncellenir (örneğin şimdi + 0.5 saniye)
+            m_NextUnitDetectionTime = Time.time + m_UnitDetectionCheckRate;
+            foe = m_GameManager.FindClosestUnit(transform.position, m_ObjectDetectionRadius, !IsPlayer);
+            return foe != null;
+        }
+        else
+        {
+            // Süre dolmadığı için tekrar arama yapılmaz
+            // Hedef null döndürülür
+            foe = null;
+            return false;
+        }
     }
 
     protected Collider2D[] RunProximityObjectDetection()
