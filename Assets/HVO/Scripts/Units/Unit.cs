@@ -144,13 +144,18 @@ public abstract class Unit : MonoBehaviour
     {
         if (Time.time >= m_NextUnitDetectionTime)
         {
-            Debug.Log("Checking");
+            // Hedef tespiti yapılır
+            // En yakın düşman GameManager.FindClosestUnit ile bulunur
+            // Eğer bulunduysa out parametresine atanır
+            // m_NextUnitDetectionTime güncellenir (örneğin şimdi + 0.5 saniye)
             m_NextUnitDetectionTime = Time.time + m_UnitDetectionCheckRate;
             foe = m_GameManager.FindClosestUnit(transform.position, m_ObjectDetectionRadius, !IsPlayer);
             return foe != null;
         }
         else
         {
+            // Süre dolmadığı için tekrar arama yapılmaz
+            // Hedef null döndürülür
             foe = null;
             return false;
         }
