@@ -89,23 +89,43 @@ public class GameManager : SingletonManager<GameManager>
         }
     }
 
+
+    // GameManager içinde yer alan bu metot, verilen konumdan (originPosition)
+    // belirli bir mesafedeki en yakın Unit (oyuncu veya düşman) nesnesini bulur.
     public Unit FindClosestUnit(Vector3 originPosition, float maxDistance, bool IsPlayer)
     {
+        // Aranacak hedef listesini belirle: Eğer IsPlayer true ise düşman birimi arıyordur
+        // (çünkü bu metot genellikle düşman için oyuncuyu, oyuncu için düşmanı arar)
+        // Bu yüzden IsPlayer true ise oyuncu birimleri listesi döner
         List<Unit> units = IsPlayer ? m_PlayerUnits : m_Enemies;
+
+        // Performans açısından kare mesafe kullanılır (sqrt hesaplamasından kaçınmak için)
         float sqrMaxDistance = maxDistance * maxDistance;
+
+        // En yakın bulunan Unit burada saklanacak (başlangıçta null)
         Unit closestUnit = null;
+
+        // Şimdiye kadar bulunan en kısa kare mesafe (başlangıçta maksimum değer)
         float closestDistanceSqr = float.MaxValue;
 
+        // Listedeki tüm birimleri sırayla kontrol et
         foreach (Unit unit in units)
         {
+            // Bu birimin pozisyonu ile originPosition arasındaki vektörel farkın karesi
             float sqrDistance = (unit.transform.position - originPosition).sqrMagnitude;
+
+            // Eğer bu birim:
+            // 1. Belirlenen maksimum menzil içinde kalıyorsa
+            // 2. Şimdiye kadar bulunanlardan daha yakınsa
+            // ... o zaman bu birimi en yakın olarak işaretle
             if (sqrDistance < sqrMaxDistance && sqrDistance < closestDistanceSqr)
             {
                 closestUnit = unit;
-                closestDistanceSqr = sqrDistance;
+                closestDistanceSqr = sqrDistance; // en yakın mesafe güncellenir
             }
         }
-
+        
+        // En yakın bulunan Unit (veya hiç bulunamadıysa null) döndürülür
         return closestUnit;
     }
 
