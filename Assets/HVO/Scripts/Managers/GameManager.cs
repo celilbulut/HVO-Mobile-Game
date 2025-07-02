@@ -1,6 +1,7 @@
 
+using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
-using UnityEngine.Tilemaps;
 
 public enum ClickType
 {
@@ -25,6 +26,10 @@ public class GameManager : SingletonManager<GameManager>
     [SerializeField] private ParticleSystem m_ConstructionEffectPrefab;
 
     public Unit ActiveUnit;
+
+    private List<Unit> m_PlayerUnits = new();
+    private List<Unit> m_Enemies = new();
+
     private CameraController m_CameraController;
     private PlacementProcess m_PlacementProcess;
 
@@ -53,6 +58,34 @@ public class GameManager : SingletonManager<GameManager>
         else if (HvoUtils.TryGetShortClickPosition(out Vector2 inputPos))
         {
             DetectClick(inputPos);
+        }
+    }
+
+    public void RegisterUnit(Unit unit)
+    {
+        if (unit.IsPlayer)
+        {
+            m_PlayerUnits.Add(unit);
+        }
+        else
+        {
+            m_Enemies.Add(unit);
+        }
+
+        Debug.Log("Player Units: " + string.Join(", ", m_PlayerUnits.Select(unit => unit.gameObject.name)));
+        Debug.Log("Enemies: " + string.Join(", ", m_Enemies.Select(unit => unit.gameObject.name)));
+
+    }
+
+    public void UnRegisterUnit(Unit unit)
+    {
+        if (unit.IsPlayer)
+        {
+            m_PlayerUnits.Remove(unit);
+        }
+        else
+        {
+            m_Enemies.Remove(unit);
         }
     }
 

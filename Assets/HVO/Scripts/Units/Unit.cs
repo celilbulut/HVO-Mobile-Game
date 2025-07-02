@@ -24,6 +24,7 @@ public abstract class Unit : MonoBehaviour
     [SerializeField] protected float m_ObjectDetectionRadius = 3f;
 
     public bool IsTarget;
+    protected GameManager m_GameManager;
     protected Animator m_Animator;
     protected AIPawn m_AIPawn;
     protected SpriteRenderer m_SpriteRenderer;
@@ -42,6 +43,11 @@ public abstract class Unit : MonoBehaviour
 
     public bool HasTarget => Target != null;
 
+    protected virtual void Start()
+    {
+        RegisterUnit();
+    }
+
     protected void Awake()
     {
         if (TryGetComponent<Animator>(out var animator))
@@ -55,6 +61,7 @@ public abstract class Unit : MonoBehaviour
             m_AIPawn.OnNewPositionSelected += TurnToPosition;
         }
 
+        m_GameManager = GameManager.Get();
         m_SpriteRenderer = GetComponent<SpriteRenderer>();
         m_OriginalMaterial = m_SpriteRenderer.material;
         m_HighlightMaterial = Resources.Load<Material>("Materials/Outline");
@@ -63,9 +70,11 @@ public abstract class Unit : MonoBehaviour
     void OnDestroy()
     {
         if (m_AIPawn != null)
-        { 
+        {
             m_AIPawn.OnNewPositionSelected -= TurnToPosition;
         }
+
+        UnRegisterUnit();
     }
 
     public void SetTask(UnitTask task)
@@ -117,6 +126,16 @@ public abstract class Unit : MonoBehaviour
     protected virtual void OnSetState(UnitState oldState, UnitState newState)
     {
         CurrentState = newState;
+    }
+
+    public virtual void RegisterUnit()
+    {
+        m_GameManager.RegisterUnit(this);
+    }
+
+    public virtual void UnRegisterUnit()
+    {
+        m_GameManager.UnRegisterUnit(this);
     }
 
     protected Collider2D[] RunProximityObjectDetection()
