@@ -2,6 +2,9 @@ using UnityEngine;
 
 public class EnemyUnit : HumanoidUnit
 {
+    private float m_AttackCommitmentTime = 1f;
+    private float m_CurrentAttackCommitmentTime = 0f;
+
     public override bool IsPlayer => false;
 
     protected override void UpdateBehaviour()
@@ -42,12 +45,17 @@ public class EnemyUnit : HumanoidUnit
                 {
                     if (IsTargetInRange(Target.transform))
                     {
-                        TryAttackCurrentTarget(); // Artık cooldown’a göre çalışıyor
+                        m_CurrentAttackCommitmentTime = m_AttackCommitmentTime;
+                        TryAttackCurrentTarget(); // Artık cooldown’a göre çalışıyor                        
                     }
                     else
                     {
-                        // Hedef kaçtıysa hareket moduna dön
-                        SetState(UnitState.Moving);
+                        m_CurrentAttackCommitmentTime -= Time.deltaTime;
+                        if (m_CurrentAttackCommitmentTime <= 0)
+                        {
+                            // Hedef kaçtıysa hareket moduna dön
+                            SetState(UnitState.Moving);
+                        }
                     }
                 }
                 else
