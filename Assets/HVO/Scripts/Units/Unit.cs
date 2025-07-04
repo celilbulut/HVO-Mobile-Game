@@ -1,3 +1,4 @@
+using System.Collections;
 using UnityEngine;
 
 public enum UnitState
@@ -23,6 +24,10 @@ public abstract class Unit : MonoBehaviour
     [SerializeField] private ActionSO[] m_Actions;
     [SerializeField] protected float m_ObjectDetectionRadius = 3f;
     [SerializeField] protected float m_UnitDetectionCheckRate = 0.5f;
+    [SerializeField] protected float m_AttackRange = 1f;
+    [SerializeField] protected float m_AutoAttackFrequency = 1.5f;
+    [SerializeField] protected float m_AutoAttackDamageDelay = 0.5f;
+    [SerializeField] protected int m_AutoAttackDamage = 7;
 
     public bool IsTarget;
     protected GameManager m_GameManager;
@@ -31,7 +36,9 @@ public abstract class Unit : MonoBehaviour
     protected SpriteRenderer m_SpriteRenderer;
     protected Material m_OriginalMaterial;
     protected Material m_HighlightMaterial;
+
     protected float m_NextUnitDetectionTime;
+    protected float m_NextAutoAttackTime;
 
     public ActionSO[] Actions => m_Actions;
     public SpriteRenderer Renderer => m_SpriteRenderer;
@@ -115,6 +122,11 @@ public abstract class Unit : MonoBehaviour
         IsTarget = false;
     }
 
+    public void StopMovement()
+    {
+        m_AIPawn.Stop(); // IPawn üzerindeki stop fonksiyonu çağrılır
+    }
+
     protected virtual void OnSetDestination()
     {
 
@@ -140,6 +152,8 @@ public abstract class Unit : MonoBehaviour
         m_GameManager.UnRegisterUnit(this);
     }
 
+    // En yakın düşmanı (veya oyuncuyu) belli aralıklarla bulur
+    // Gereksiz yere her frame’de çalışmaz, zamanlıdır
     protected virtual bool TryFindClosestFoe(out Unit foe)
     {
         if (Time.time >= m_NextUnitDetectionTime)
@@ -159,6 +173,45 @@ public abstract class Unit : MonoBehaviour
             foe = null;
             return false;
         }
+    }
+
+    protected virtual bool TryAttackCurrentTarget()
+    {
+        if (Time.time >= m_NextAutoAttackTime)
+        {
+            m_NextAutoAttackTime = Time.time + m_AutoAttackFrequency;
+            PerformAttackAnimation();
+            StartCoroutine(DelayDamage(m_AutoAttackDamageDelay, m_AutoAttackDamage, Target));
+            return true;
+        }
+
+        return false;
+    }
+
+    protected virtual void PerformAttackAnimation()
+    {
+
+    }
+
+    protected virtual void TakeDamage(int damage, Unit damager)
+    {
+        Debug.Log($"{this.gameObject.name} took: {damage} points from {damager.gameObject.name}");
+    }
+
+    protected IEnumerator DelayDamage(float delay, int damage, Unit target)
+    {
+        yield return new WaitForSeconds(delay);
+
+        if (target != null)
+        {
+            target.TakeDamage(damage, this);
+        }
+    }
+
+    // Hedefin saldırı menziline girip girmediğini kontrol eder
+    protected bool IsTargetInRange(Transform target)
+    {
+        return Vector3.Distance(target.transform.position, transform.position) <= m_AttackRange;
     }
 
     protected Collider2D[] RunProximityObjectDetection()
@@ -186,5 +239,8 @@ public abstract class Unit : MonoBehaviour
     {
         Gizmos.color = new Color(0, 0, 1, 0.3f);
         Gizmos.DrawSphere(transform.position, m_ObjectDetectionRadius);
+
+        Gizmos.color = new Color(1, 0, 0, 0.4f);
+        Gizmos.DrawSphere(transform.position, m_AttackRange);
     }
 }
