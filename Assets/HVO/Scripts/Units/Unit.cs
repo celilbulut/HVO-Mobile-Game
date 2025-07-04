@@ -176,13 +176,18 @@ public abstract class Unit : MonoBehaviour
     {
         if (Time.time >= m_NextAutoAttackTime)
         {
-            Debug.Log("Attack!");
             m_NextAutoAttackTime = Time.time + m_AutoAttackFrequency;
+            PerformAttackAnimation();
             return true;
         }
 
         Debug.Log("Attack On CS!");
         return false;
+    }
+
+    protected virtual void PerformAttackAnimation()
+    {
+        
     }
 
     // Hedefin saldırı menziline girip girmediğini kontrol eder

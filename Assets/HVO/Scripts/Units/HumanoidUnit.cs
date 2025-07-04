@@ -39,11 +39,27 @@ public class HumanoidUnit : Unit
         {
             var state = m_SmoothedSpeed > 0.1f ? UnitState.Moving : UnitState.Idle;
             SetState(state);
-        }        
+        }
     }
 
     protected virtual void UpdateMovementAnimation()
     {
         m_Animator?.SetFloat("Speed", Mathf.Clamp01(m_SmoothedSpeed));
+    }
+
+    protected override void PerformAttackAnimation()
+    {
+        Vector3 direction = (Target.transform.position - transform.position).normalized;
+
+        // Eger hedefin solunda yada sagindaysa oraya bakarak saldiri yapmasi
+        if (Mathf.Abs(direction.x) > Mathf.Abs(direction.y))
+        {
+            m_SpriteRenderer.flipX = direction.x < 0;
+            m_Animator.SetTrigger("AttackHorizontal"); // Yazim onemli animatorle ayni olmali.
+        }
+        else // Eger hedefin yukarisinda yada asagisindaysa
+        {
+            m_Animator.SetTrigger(direction.y > 0 ? "AttackUp" : "AttackDown"); // Yazim onemli animatorle ayni olmali.
+        }
     }
 }
