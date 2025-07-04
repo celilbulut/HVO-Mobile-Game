@@ -119,6 +119,11 @@ public abstract class Unit : MonoBehaviour
         IsTarget = false;
     }
 
+    public void StopMovement()
+    {
+        m_AIPawn.Stop(); // IPawn üzerindeki stop fonksiyonu çağrılır
+    }
+
     protected virtual void OnSetDestination()
     {
 

@@ -64,7 +64,12 @@ public class AIPawn : MonoBehaviour
         m_CurrentNodeIndex = 0;
 
         OnNewPositionSelected.Invoke(m_CurrentPath[m_CurrentNodeIndex]);
+    }
 
+    public void Stop()
+    {
+        m_CurrentPath.Clear(); // Tüm path (hedef noktaları) temizlenir
+        m_CurrentNodeIndex = 0; // Mevcut hedef sıfırlanır
     }
 
     bool IsPathValid()
