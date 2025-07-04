@@ -17,6 +17,7 @@ public class GameManager : SingletonManager<GameManager>
     [SerializeField] private PointToClick m_PointToBuildPrefab;
     [SerializeField] private ActionBar m_ActionBar;
     [SerializeField] private ConfirmationBar m_BuildConfirmationBar;
+    [SerializeField] private TextPopupController m_TextPopupController;
 
     [Header("Camera Settings")]
     [SerializeField] private float m_PanSpeed = 100;
@@ -89,6 +90,10 @@ public class GameManager : SingletonManager<GameManager>
         }
     }
 
+    public void ShowTextPopup(string text, Vector3 position, Color color)
+    {
+        m_TextPopupController.Spawn(text, position, color);
+    }
 
     // GameManager içinde yer alan bu metot, verilen konumdan (originPosition)
     // belirli bir mesafedeki en yakın Unit (oyuncu veya düşman) nesnesini bulur.
@@ -124,7 +129,7 @@ public class GameManager : SingletonManager<GameManager>
                 closestDistanceSqr = sqrDistance; // en yakın mesafe güncellenir
             }
         }
-        
+
         // En yakın bulunan Unit (veya hiç bulunamadıysa null) döndürülür
         return closestUnit;
     }
