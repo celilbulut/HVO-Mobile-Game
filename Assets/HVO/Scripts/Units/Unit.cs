@@ -1,3 +1,4 @@
+using System.Collections;
 using UnityEngine;
 
 public enum UnitState
@@ -25,6 +26,8 @@ public abstract class Unit : MonoBehaviour
     [SerializeField] protected float m_UnitDetectionCheckRate = 0.5f;
     [SerializeField] protected float m_AttackRange = 1f;
     [SerializeField] protected float m_AutoAttackFrequency = 1.5f;
+    [SerializeField] protected float m_AutoAttackDamageDelay = 0.5f;
+    [SerializeField] protected int m_AutoAttackDamage = 7;
 
     public bool IsTarget;
     protected GameManager m_GameManager;
@@ -178,16 +181,31 @@ public abstract class Unit : MonoBehaviour
         {
             m_NextAutoAttackTime = Time.time + m_AutoAttackFrequency;
             PerformAttackAnimation();
+            StartCoroutine(DelayDamage(m_AutoAttackDamageDelay, m_AutoAttackDamage, Target));
             return true;
         }
 
-        Debug.Log("Attack On CS!");
         return false;
     }
 
     protected virtual void PerformAttackAnimation()
     {
-        
+
+    }
+
+    protected virtual void TakeDamage(int damage, Unit damager)
+    {
+        Debug.Log($"{this.gameObject.name} took: {damage} points from {damager.gameObject.name}");
+    }
+
+    protected IEnumerator DelayDamage(float delay, int damage, Unit target)
+    {
+        yield return new WaitForSeconds(delay);
+
+        if (target != null)
+        {
+            target.TakeDamage(damage, this);
+        }
     }
 
     // Hedefin saldırı menziline girip girmediğini kontrol eder
