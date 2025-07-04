@@ -24,6 +24,7 @@ public abstract class Unit : MonoBehaviour
     [SerializeField] protected float m_ObjectDetectionRadius = 3f;
     [SerializeField] protected float m_UnitDetectionCheckRate = 0.5f;
     [SerializeField] protected float m_AttackRange = 1f;
+    [SerializeField] protected float m_AutoAttackFrequency = 1.5f;
 
     public bool IsTarget;
     protected GameManager m_GameManager;
@@ -32,7 +33,9 @@ public abstract class Unit : MonoBehaviour
     protected SpriteRenderer m_SpriteRenderer;
     protected Material m_OriginalMaterial;
     protected Material m_HighlightMaterial;
+
     protected float m_NextUnitDetectionTime;
+    protected float m_NextAutoAttackTime;
 
     public ActionSO[] Actions => m_Actions;
     public SpriteRenderer Renderer => m_SpriteRenderer;
@@ -162,6 +165,19 @@ public abstract class Unit : MonoBehaviour
             foe = null;
             return false;
         }
+    }
+
+    protected virtual bool TryAttackCurrentTarget()
+    {
+        if (Time.time >= m_NextAutoAttackTime)
+        {
+            Debug.Log("Attack!");
+            m_NextAutoAttackTime = Time.time + m_AutoAttackFrequency;
+            return true;
+        }
+
+        Debug.Log("Attack On CS!");
+        return false;
     }
 
     // Hedefin saldırı menziline girip girmediğini kontrol eder

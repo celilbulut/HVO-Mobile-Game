@@ -18,14 +18,12 @@ public class EnemyUnit : HumanoidUnit
                     if (IsTargetInRange(Target.transform))
                     {
                         Debug.Log("Changing to Attacking State");
-
                         SetState(UnitState.Attacking);
                         //Stop Movement!
                     }
                     else
                     {
                         Debug.Log("Target Detected - Move to Target!");
-
                         MoveTo(Target.transform.position);
                     }
                 }
@@ -47,10 +45,11 @@ public class EnemyUnit : HumanoidUnit
                 {
                     if (IsTargetInRange(Target.transform))
                     {
-                        Debug.Log("Attacking!");
+                        TryAttackCurrentTarget(); // Artık cooldown’a göre çalışıyor
                     }
                     else
                     {
+                        // Hedef kaçtıysa hareket moduna dön
                         Debug.Log("Back to moving state!");
                         SetState(UnitState.Moving);
                     }
