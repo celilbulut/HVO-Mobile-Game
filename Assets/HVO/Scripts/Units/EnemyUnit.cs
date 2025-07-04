@@ -6,9 +6,61 @@ public class EnemyUnit : HumanoidUnit
 
     protected override void UpdateBehaviour()
     {
-        if (TryFindClosestFoe(out var foe))
+        switch (CurrentState)
         {
-            Debug.Log(foe.gameObject.name);
-        }
+            case UnitState.Idle:
+
+            case UnitState.Moving:
+                // Eğer hedef yoksa: algıla ve hedefe yürü
+                // Eğer hedef varsa: menzile girmişse saldır, girmemişse yaklaş
+                if (HasTarget)
+                {
+                    if (IsTargetInRange(Target.transform))
+                    {
+                        Debug.Log("Changing to Attacking State");
+
+                        SetState(UnitState.Attacking);
+                        //Stop Movement!
+                    }
+                    else
+                    {
+                        Debug.Log("Target Detected - Move to Target!");
+
+                        MoveTo(Target.transform.position);
+                    }
+                }
+                else
+                {
+                    if (TryFindClosestFoe(out var foe))
+                    {
+                        SetTarget(foe);
+                        MoveTo(foe.transform.position);
+                        Debug.Log("Move to target!");
+                    }
+                }
+                break;
+
+            case UnitState.Attacking:
+                // Eğer hedef hâlâ menzildeyse: saldır
+                // Değilse: tekrar hareket et veya hedefi kaybet
+                if (HasTarget)
+                {
+                    if (IsTargetInRange(Target.transform))
+                    {
+                        Debug.Log("Attacking!");
+                    }
+                    else
+                    {
+                        Debug.Log("Back to moving state!");
+                        SetState(UnitState.Moving);
+                    }
+                }
+                else
+                {
+                    Debug.Log("Back to Idle state!");
+                    SetState(UnitState.Idle);
+                }
+                break;
+        }        
     }
 }

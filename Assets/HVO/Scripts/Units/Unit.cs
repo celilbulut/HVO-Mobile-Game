@@ -23,6 +23,7 @@ public abstract class Unit : MonoBehaviour
     [SerializeField] private ActionSO[] m_Actions;
     [SerializeField] protected float m_ObjectDetectionRadius = 3f;
     [SerializeField] protected float m_UnitDetectionCheckRate = 0.5f;
+    [SerializeField] protected float m_AttackRange = 1f;
 
     public bool IsTarget;
     protected GameManager m_GameManager;
@@ -140,6 +141,8 @@ public abstract class Unit : MonoBehaviour
         m_GameManager.UnRegisterUnit(this);
     }
 
+    // En yakın düşmanı (veya oyuncuyu) belli aralıklarla bulur
+    // Gereksiz yere her frame’de çalışmaz, zamanlıdır
     protected virtual bool TryFindClosestFoe(out Unit foe)
     {
         if (Time.time >= m_NextUnitDetectionTime)
@@ -159,6 +162,12 @@ public abstract class Unit : MonoBehaviour
             foe = null;
             return false;
         }
+    }
+
+    // Hedefin saldırı menziline girip girmediğini kontrol eder
+    protected bool IsTargetInRange(Transform target)
+    {
+        return Vector3.Distance(target.transform.position, transform.position) <= m_AttackRange;
     }
 
     protected Collider2D[] RunProximityObjectDetection()
@@ -186,5 +195,8 @@ public abstract class Unit : MonoBehaviour
     {
         Gizmos.color = new Color(0, 0, 1, 0.3f);
         Gizmos.DrawSphere(transform.position, m_ObjectDetectionRadius);
+
+        Gizmos.color = new Color(1, 0, 0, 0.4f);
+        Gizmos.DrawSphere(transform.position, m_AttackRange);
     }
 }
