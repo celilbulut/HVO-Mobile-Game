@@ -40,7 +40,7 @@ public class TextPopup : MonoBehaviour
 
         // Pozisyon animasyonu (X ve Y offset)
         float xOffset = m_X_OffsetCurve.Evaluate(normalizedTime); // saga-sola dogru gidiyor
-        float yOffset = m_Y_OffsetCurve.Evaluate(normalizedTime); // yukari yada asagi dogru
+        float yOffset = m_Y_OffsetCurve.Evaluate(normalizedTime) * 2; // yukari yada asagi dogru
 
         transform.position += new Vector3(xOffset, yOffset, 0) * Time.deltaTime;
     }
