@@ -37,7 +37,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
-  m_AnchoredPosition: {x: 1.545, y: -0.699}
+  m_AnchoredPosition: {x: 1.545044, y: -0.6989746}
   m_SizeDelta: {x: 100, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!223 &4670785338711798088
@@ -116,6 +116,149 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Text: {fileID: 8619619957991754112}
+  m_Duration: 0.8
+  m_TextAnimationSize: 5
+  m_FrontSizeCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 1
+      outSlope: 1
+      tangentMode: 34
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    - serializedVersion: 3
+      time: 1
+      value: 1
+      inSlope: 1
+      outSlope: 1
+      tangentMode: 34
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  m_X_OffsetCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 1.0527885
+      outSlope: 1.0527885
+      tangentMode: 34
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0.33333334
+    - serializedVersion: 3
+      time: 0.44951773
+      value: 0.4732471
+      inSlope: 0.9920429
+      outSlope: 0.9920429
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.08263246
+      outWeight: 0.33333334
+    - serializedVersion: 3
+      time: 0.6925379
+      value: 5
+      inSlope: 1.7017155
+      outSlope: 1.7017155
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.08607711
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  m_Y_OffsetCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: -0.29131174
+      outSlope: 0.66573614
+      tangentMode: 65
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0.33333334
+    - serializedVersion: 3
+      time: 0.28881758
+      value: 0.1922763
+      inSlope: 0.9205063
+      outSlope: 0.9205063
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.11663198
+      outWeight: 0.26854205
+    - serializedVersion: 3
+      time: 0.451942
+      value: 1.4069214
+      inSlope: -0
+      outSlope: -0.06899728
+      tangentMode: 1
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.345667
+    - serializedVersion: 3
+      time: 1
+      value: 0
+      inSlope: -2.567103
+      outSlope: -2.567103
+      tangentMode: 34
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  m_AlphaCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 34
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0.33333334
+    - serializedVersion: 3
+      time: 0.07205453
+      value: 1
+      inSlope: -0.026591253
+      outSlope: -0.026591253
+      tangentMode: 34
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    - serializedVersion: 3
+      time: 0.7127272
+      value: 0.9659274
+      inSlope: -0.21527511
+      outSlope: -0.21527511
+      tangentMode: 0
+      weightedMode: 3
+      inWeight: 0.333785
+      outWeight: 0.50393206
+    - serializedVersion: 3
+      time: 1
+      value: 0
+      inSlope: -3.3624046
+      outSlope: -3.3624046
+      tangentMode: 34
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
 --- !u!1 &4891139850880160265
 GameObject:
   m_ObjectHideFlags: 0
@@ -208,8 +351,8 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 60
-  m_fontSizeBase: 60
+  m_fontSize: 80
+  m_fontSizeBase: 80
   m_fontWeight: 400
   m_enableAutoSizing: 0
   m_fontSizeMin: 18
