@@ -13,6 +13,12 @@ public class TextPopup : MonoBehaviour
 
 
     private float m_ElapsedTime;
+    private int m_RandomXdirection = 1;
+
+    void Start()
+    {
+        m_RandomXdirection = Random.Range(-1, 2);
+    }
 
     public void SetText(string text, Color color)
     {
@@ -39,7 +45,7 @@ public class TextPopup : MonoBehaviour
         m_Text.color = new Color(m_Text.color.r, m_Text.color.g, m_Text.color.b, alpha);
 
         // Pozisyon animasyonu (X ve Y offset)
-        float xOffset = m_X_OffsetCurve.Evaluate(normalizedTime); // saga-sola dogru gidiyor
+        float xOffset = m_X_OffsetCurve.Evaluate(normalizedTime) * 1.1f * m_RandomXdirection; // saga-sola dogru gidiyor
         float yOffset = m_Y_OffsetCurve.Evaluate(normalizedTime) * 2; // yukari yada asagi dogru
 
         transform.position += new Vector3(xOffset, yOffset, 0) * Time.deltaTime;
