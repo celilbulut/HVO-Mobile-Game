@@ -14,6 +14,15 @@ public class SoldierUnit : HumanoidUnit
         base.OnSetTask(oldTask, newTask);
     }
 
+    protected override void OnSetDestination()
+    {
+        if (CurrentTask == UnitTask.Attack)
+        {
+            SetTask(UnitTask.None);
+            SetTarget(null);
+        }
+    }
+
     // Birimin davranışlarını her frame güncelleyen metot.
     // Basit bir state machine (durum makinesi) yapısı kullanır.
     protected override void UpdateBehaviour()
@@ -30,6 +39,14 @@ public class SoldierUnit : HumanoidUnit
                     // Hareketi durdur ve saldırı durumuna geç
                     StopMovement();
                     SetState(UnitState.Attacking);
+                }
+            }
+            else
+            {
+                if (TryFindClosestFoe(out var foe))
+                {
+                    SetTarget(foe);
+                    SetTask(UnitTask.Attack);
                 }
             }
         }
