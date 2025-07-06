@@ -6,11 +6,12 @@ public class AIPawn : MonoBehaviour
 {
     [SerializeField] private float m_Speed = 5f;
 
-    public UnityAction<Vector3> OnNewPositionSelected = delegate { };
-
     private TilemapManager m_TilemapManager;
     private List<Vector3> m_CurrentPath = new();
     private int m_CurrentNodeIndex;
+    
+    public UnityAction<Vector3> OnNewPositionSelected = delegate { };
+    public UnityAction OnDestinationReached = delegate { };
 
     void Start() // Ekrana tiklama yaptigimiz yer
     {
@@ -34,7 +35,7 @@ public class AIPawn : MonoBehaviour
         {
             if (m_CurrentNodeIndex == m_CurrentPath.Count - 1)
             {
-                Debug.Log("Destination Reached!");
+                OnDestinationReached.Invoke();
                 m_CurrentPath = new();
             }
             else

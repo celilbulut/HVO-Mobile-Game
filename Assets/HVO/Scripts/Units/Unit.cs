@@ -1,4 +1,5 @@
 using System.Collections;
+using Unity.VisualScripting;
 using UnityEngine;
 
 public enum UnitState
@@ -75,6 +76,7 @@ public abstract class Unit : MonoBehaviour
         {
             m_AIPawn = aiPawn;
             m_AIPawn.OnNewPositionSelected += TurnToPosition;
+            m_AIPawn.OnDestinationReached += OnDestinationReached;
         }
 
         m_Collider = GetComponent<CapsuleCollider2D>();
@@ -91,9 +93,8 @@ public abstract class Unit : MonoBehaviour
         if (m_AIPawn != null)
         {
             m_AIPawn.OnNewPositionSelected -= TurnToPosition;
+            m_AIPawn.OnDestinationReached -= OnDestinationReached;
         }
-
-        //UnRegisterUnit();
     }
 
     public void SetTask(UnitTask task)
@@ -157,6 +158,11 @@ public abstract class Unit : MonoBehaviour
     protected virtual void OnSetState(UnitState oldState, UnitState newState)
     {
         CurrentState = newState;
+    }
+    
+    protected virtual void OnDestinationReached()
+    {
+        
     }
 
     public virtual void RegisterUnit()
@@ -258,7 +264,7 @@ public abstract class Unit : MonoBehaviour
 
             m_SpriteRenderer.color = originalColor;
             yield return new WaitForSeconds(duration / 2f);
-        }   
+        }
     }
 
     protected IEnumerator DelayDamage(float delay, int damage, Unit target)

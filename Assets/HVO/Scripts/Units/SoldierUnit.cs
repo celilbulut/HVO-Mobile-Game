@@ -2,6 +2,8 @@ using UnityEngine;
 
 public class SoldierUnit : HumanoidUnit
 {
+    private bool m_IsRetreating = false;
+
     protected override void OnSetTask(UnitTask oldTask, UnitTask newTask)
     {
         // Eğer yeni görev "Attack" ise ve geçerli bir hedef varsa
@@ -16,10 +18,23 @@ public class SoldierUnit : HumanoidUnit
 
     protected override void OnSetDestination()
     {
-        if (CurrentTask == UnitTask.Attack)
+        if (HasTarget && (CurrentTask == UnitTask.Attack || CurrentState == UnitState.Attacking))
         {
-            SetTask(UnitTask.None);
-            SetTarget(null);
+            m_IsRetreating = true;
+        }
+
+        if (CurrentTask == UnitTask.Attack)
+            {
+                SetTask(UnitTask.None);
+                SetTarget(null);
+            }
+    }
+
+    protected override void OnDestinationReached()
+    {
+        if (m_IsRetreating)
+        {
+            m_IsRetreating = false;
         }
     }
 
@@ -43,7 +58,7 @@ public class SoldierUnit : HumanoidUnit
             }
             else
             {
-                if (TryFindClosestFoe(out var foe))
+                if (!m_IsRetreating && TryFindClosestFoe(out var foe))
                 {
                     SetTarget(foe);
                     SetTask(UnitTask.Attack);
