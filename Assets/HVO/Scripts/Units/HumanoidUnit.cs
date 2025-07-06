@@ -17,6 +17,8 @@ public class HumanoidUnit : Unit
 
     protected void Update()
     {
+        if (CurrentState == UnitState.Dead) return;
+
         UpdateVelocity();
         UpdateBehaviour();
         UpdateMovementAnimation();

@@ -116,6 +116,8 @@ public class GameManager : SingletonManager<GameManager>
         // Listedeki tüm birimleri sırayla kontrol et
         foreach (Unit unit in units)
         {
+            if (unit.CurrentState == UnitState.Dead) continue;
+
             // Bu birimin pozisyonu ile originPosition arasındaki vektörel farkın karesi
             float sqrDistance = (unit.transform.position - originPosition).sqrMagnitude;
 
@@ -223,6 +225,8 @@ public class GameManager : SingletonManager<GameManager>
 
     void SelectNewUnit(Unit unit)
     {
+        if (unit.CurrentState == UnitState.Dead) return;
+
         if (HasActiveUnit)
         {
             ActiveUnit.DeSelect();
