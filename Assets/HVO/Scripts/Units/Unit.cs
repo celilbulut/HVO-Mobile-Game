@@ -30,7 +30,7 @@ public abstract class Unit : MonoBehaviour
     [SerializeField] protected float m_AutoAttackDamageDelay = 0.5f;
     [SerializeField] protected int m_AutoAttackDamage = 7;
     [SerializeField] protected int m_Health = 100;
-    [SerializeField] protected Color m_DamageFlashColor = new Color(1f, 0.27f, 0.25f, 1f);
+    [SerializeField] protected Color m_DamageFlashColor = new Color(1f, 0.63f, 0.63f, 1f);
 
     public bool IsTarget;
 
