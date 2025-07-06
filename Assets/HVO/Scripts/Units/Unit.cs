@@ -211,13 +211,9 @@ public abstract class Unit : MonoBehaviour
 
     protected virtual void Die()
     {
-        Debug.Log("Unit is dead!");
         SetState(UnitState.Dead);
 
-        if (IsTarget)
-        {
-            DeSelect();
-        }
+        Destroy(gameObject);
     }
 
     protected virtual void TakeDamage(int damage, Unit damager)
