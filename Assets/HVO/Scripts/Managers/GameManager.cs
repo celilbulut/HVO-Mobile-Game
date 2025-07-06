@@ -94,6 +94,7 @@ public class GameManager : SingletonManager<GameManager>
                 ActiveUnit = null;
             }
 
+            unit.StopMovement(); // Object öldüğünde hareket etmesini durduruyor.
             m_PlayerUnits.Remove(unit);
         }
         else

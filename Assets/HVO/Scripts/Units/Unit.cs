@@ -92,7 +92,7 @@ public abstract class Unit : MonoBehaviour
             m_AIPawn.OnNewPositionSelected -= TurnToPosition;
         }
 
-        UnRegisterUnit();
+        //UnRegisterUnit();
     }
 
     public void SetTask(UnitTask task)
@@ -218,7 +218,7 @@ public abstract class Unit : MonoBehaviour
     {
         SetState(UnitState.Dead);
         RunDeadEffect();
-        //Destroy(gameObject);
+        UnRegisterUnit();
     }
 
     protected virtual void TakeDamage(int damage, Unit damager)

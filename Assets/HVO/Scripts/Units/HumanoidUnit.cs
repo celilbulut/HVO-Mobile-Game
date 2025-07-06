@@ -1,4 +1,4 @@
-using System;
+using System.Collections;
 using UnityEngine;
 
 public class HumanoidUnit : Unit
@@ -68,5 +68,13 @@ public class HumanoidUnit : Unit
     protected override void RunDeadEffect()
     {
         m_Animator.SetTrigger("Dead");
+        StartCoroutine(LateObjectDestroy(1.2f)); // 1.2f saniye sonra olecek.
+    }
+
+    // Olen bir Objenin Animasyondan sonra olmesi icin delay ekliyoruz
+    private IEnumerator LateObjectDestroy(float delay)
+    {
+        yield return new WaitForSeconds(delay);
+        Destroy(gameObject);
     }
 }
