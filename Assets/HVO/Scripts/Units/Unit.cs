@@ -30,6 +30,7 @@ public abstract class Unit : MonoBehaviour
     [SerializeField] protected float m_AutoAttackDamageDelay = 0.5f;
     [SerializeField] protected int m_AutoAttackDamage = 7;
     [SerializeField] protected int m_Health = 100;
+    [SerializeField] protected Color m_DamageFlashColor = new Color(1f, 0.27f, 0.25f, 1f);
 
     public bool IsTarget;
 
@@ -236,10 +237,22 @@ public abstract class Unit : MonoBehaviour
             Color.red
         );
 
+        // Hasar alinca kirmizi yanip sonmesi icin olusturdugumuz flash effect
+        StartCoroutine(FlashEffect(0.2f, m_DamageFlashColor));
+
         if (m_CurrentHealth <= 0)
         {
             Die();
         }
+    }
+
+    // Hasar alinca kirmizi yanip sonmesi icin olusturdugumuz flash effect
+    protected IEnumerator FlashEffect(float duration, Color color)
+    {
+        Color originalColor = m_SpriteRenderer.color;
+        m_SpriteRenderer.color = color;
+        yield return new WaitForSeconds(duration);
+        m_SpriteRenderer.color = originalColor;
     }
 
     protected IEnumerator DelayDamage(float delay, int damage, Unit target)
