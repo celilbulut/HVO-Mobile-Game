@@ -209,11 +209,16 @@ public abstract class Unit : MonoBehaviour
 
     }
 
+    protected virtual void RunDeadEffect()
+    {
+
+    }
+
     protected virtual void Die()
     {
         SetState(UnitState.Dead);
-
-        Destroy(gameObject);
+        RunDeadEffect();
+        //Destroy(gameObject);
     }
 
     protected virtual void TakeDamage(int damage, Unit damager)

@@ -64,4 +64,9 @@ public class HumanoidUnit : Unit
             m_Animator.SetTrigger(direction.y > 0 ? "AttackUp" : "AttackDown"); // Yazim onemli animatorle ayni olmali.
         }
     }
+
+    protected override void RunDeadEffect()
+    {
+        m_Animator.SetTrigger("Dead");
+    }
 }
