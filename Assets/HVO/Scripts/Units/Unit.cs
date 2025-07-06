@@ -1,4 +1,5 @@
 using System.Collections;
+using Unity.VisualScripting;
 using UnityEngine;
 
 public enum UnitState
@@ -8,7 +9,8 @@ public enum UnitState
     Attacking,
     Chopping,
     Minning,
-    Building
+    Building,
+    Dead
 }
 public enum UnitTask
 {
@@ -28,6 +30,8 @@ public abstract class Unit : MonoBehaviour
     [SerializeField] protected float m_AutoAttackFrequency = 1.5f;
     [SerializeField] protected float m_AutoAttackDamageDelay = 0.5f;
     [SerializeField] protected int m_AutoAttackDamage = 7;
+    [SerializeField] protected int m_Health = 100;
+    [SerializeField] protected Color m_DamageFlashColor = new Color(1f, 0.63f, 0.63f, 1f);
 
     public bool IsTarget;
 
@@ -41,6 +45,7 @@ public abstract class Unit : MonoBehaviour
 
     protected float m_NextUnitDetectionTime;
     protected float m_NextAutoAttackTime;
+    protected int m_CurrentHealth;
 
     public ActionSO[] Actions => m_Actions;
     public SpriteRenderer Renderer => m_SpriteRenderer;
@@ -53,6 +58,7 @@ public abstract class Unit : MonoBehaviour
     public virtual bool IsBuilding => false;
 
     public bool HasTarget => Target != null;
+    public int CurrentHealth => m_CurrentHealth;
 
     protected virtual void Start()
     {
@@ -70,6 +76,7 @@ public abstract class Unit : MonoBehaviour
         {
             m_AIPawn = aiPawn;
             m_AIPawn.OnNewPositionSelected += TurnToPosition;
+            m_AIPawn.OnDestinationReached += OnDestinationReached;
         }
 
         m_Collider = GetComponent<CapsuleCollider2D>();
@@ -77,6 +84,8 @@ public abstract class Unit : MonoBehaviour
         m_SpriteRenderer = GetComponent<SpriteRenderer>();
         m_OriginalMaterial = m_SpriteRenderer.material;
         m_HighlightMaterial = Resources.Load<Material>("Materials/Outline");
+
+        m_CurrentHealth = m_Health;
     }
 
     void OnDestroy()
@@ -84,9 +93,8 @@ public abstract class Unit : MonoBehaviour
         if (m_AIPawn != null)
         {
             m_AIPawn.OnNewPositionSelected -= TurnToPosition;
+            m_AIPawn.OnDestinationReached -= OnDestinationReached;
         }
-
-        UnRegisterUnit();
     }
 
     public void SetTask(UnitTask task)
@@ -151,6 +159,11 @@ public abstract class Unit : MonoBehaviour
     {
         CurrentState = newState;
     }
+    
+    protected virtual void OnDestinationReached()
+    {
+        
+    }
 
     public virtual void RegisterUnit()
     {
@@ -187,6 +200,8 @@ public abstract class Unit : MonoBehaviour
 
     protected virtual bool TryAttackCurrentTarget()
     {
+        if (Target.CurrentState == UnitState.Dead) return false;
+
         if (Time.time >= m_NextAutoAttackTime)
         {
             m_NextAutoAttackTime = Time.time + m_AutoAttackFrequency;
@@ -203,13 +218,53 @@ public abstract class Unit : MonoBehaviour
 
     }
 
+    protected virtual void RunDeadEffect()
+    {
+
+    }
+
+    protected virtual void Die()
+    {
+        SetState(UnitState.Dead);
+        RunDeadEffect();
+        UnRegisterUnit();
+    }
+
     protected virtual void TakeDamage(int damage, Unit damager)
     {
+        if (CurrentState == UnitState.Dead) return;
+
+        m_CurrentHealth -= damage;
+
+        // Cikan damage yazisinin ayari
         m_GameManager.ShowTextPopup(
             damage.ToString(),
             GetTopPosition(),
             Color.red
         );
+
+        // Hasar alinca kirmizi yanip sonmesi icin olusturdugumuz flash effect
+        StartCoroutine(FlashEffect(0.2f, 2, m_DamageFlashColor));
+
+        if (m_CurrentHealth <= 0)
+        {
+            Die();
+        }
+    }
+
+    // Hasar alinca kirmizi yanip sonmesi icin olusturdugumuz flash effect
+    protected IEnumerator FlashEffect(float duration, int flashCount, Color color)
+    {
+        Color originalColor = m_SpriteRenderer.color;
+
+        for (int i = 0; i < flashCount; i++)
+        {
+            m_SpriteRenderer.color = color;
+            yield return new WaitForSeconds(duration / 2f);
+
+            m_SpriteRenderer.color = originalColor;
+            yield return new WaitForSeconds(duration / 2f);
+        }
     }
 
     protected IEnumerator DelayDamage(float delay, int damage, Unit target)
@@ -218,7 +273,14 @@ public abstract class Unit : MonoBehaviour
 
         if (target != null)
         {
-            target.TakeDamage(damage, this);
+            if (target.CurrentState == UnitState.Dead)
+            {
+                SetTarget(null); // hedefi sifirla
+            }
+            else
+            {
+                target.TakeDamage(damage, this);
+            }
         }
     }
 

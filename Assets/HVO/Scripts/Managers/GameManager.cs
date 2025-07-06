@@ -15,6 +15,7 @@ public class GameManager : SingletonManager<GameManager>
     [Header("UI")]
     [SerializeField] private PointToClick m_PointToMovePrefab; //Click to move yaptik
     [SerializeField] private PointToClick m_PointToBuildPrefab;
+    [SerializeField] private PointToClick m_PointToAttackPrefab;
     [SerializeField] private ActionBar m_ActionBar;
     [SerializeField] private ConfirmationBar m_BuildConfirmationBar;
     [SerializeField] private TextPopupController m_TextPopupController;
@@ -82,6 +83,19 @@ public class GameManager : SingletonManager<GameManager>
     {
         if (unit.IsPlayer)
         {
+            if (m_PlacementProcess != null)
+            {
+                CancelBuildPlacement();
+            }
+
+            if (ActiveUnit == unit)
+            {
+                ClearActionBarUI();
+                ActiveUnit.DeSelect();
+                ActiveUnit = null;
+            }
+
+            unit.StopMovement(); // Object öldüğünde hareket etmesini durduruyor.
             m_PlayerUnits.Remove(unit);
         }
         else
@@ -116,6 +130,8 @@ public class GameManager : SingletonManager<GameManager>
         // Listedeki tüm birimleri sırayla kontrol et
         foreach (Unit unit in units)
         {
+            if (unit.CurrentState == UnitState.Dead) continue;
+
             // Bu birimin pozisyonu ile originPosition arasındaki vektörel farkın karesi
             float sqrDistance = (unit.transform.position - originPosition).sqrMagnitude;
 
@@ -164,7 +180,11 @@ public class GameManager : SingletonManager<GameManager>
         {
             if (unit.IsPlayer)
             {
-                HandleClickOnPlayerUnit(unit);                
+                HandleClickOnPlayerUnit(unit);
+            }
+            else
+            {
+                HandleClickOnEnemy(unit);
             }
         }
         else
@@ -213,6 +233,16 @@ public class GameManager : SingletonManager<GameManager>
         SelectNewUnit(unit);
     }
 
+    void HandleClickOnEnemy(Unit enemyUnit)
+    {
+        if (HasActiveUnit)
+        {
+            ActiveUnit.SetTarget(enemyUnit);
+            ActiveUnit.SetTask(UnitTask.Attack);
+            DisplayClickEffect(enemyUnit.GetTopPosition(), ClickType.Attack);
+        }
+    }
+
     bool WorkerClickedOnUnfinishedBuilding(Unit clickedUnit)
     {
         return
@@ -223,6 +253,8 @@ public class GameManager : SingletonManager<GameManager>
 
     void SelectNewUnit(Unit unit)
     {
+        if (unit.CurrentState == UnitState.Dead) return;
+
         if (HasActiveUnit)
         {
             ActiveUnit.DeSelect();
@@ -260,6 +292,10 @@ public class GameManager : SingletonManager<GameManager>
         else if (clickType == ClickType.Build)
         {
             Instantiate(m_PointToBuildPrefab, (Vector3)worldPoint, Quaternion.identity);
+        }
+        else if (clickType == ClickType.Attack)
+        {
+            Instantiate(m_PointToAttackPrefab, (Vector3)worldPoint, Quaternion.identity);
         }
     }
 
