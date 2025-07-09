@@ -21,6 +21,12 @@ public enum UnitTask
     Attack,
 }
 
+public enum DestinationSource
+{
+    CodeTriggered,
+    PlayerClick
+}
+
 public abstract class Unit : MonoBehaviour
 {
     [SerializeField] private ActionSO[] m_Actions;
@@ -53,7 +59,7 @@ public abstract class Unit : MonoBehaviour
 
     public UnitState CurrentState { get; protected set; } = UnitState.Idle;
     public UnitTask CurrentTask { get; protected set; } = UnitTask.None;
-    public Unit Target {get; protected set;}
+    public Unit Target { get; protected set; }
 
     public virtual bool IsPlayer => true;
     public virtual bool IsBuilding => false;
@@ -120,13 +126,13 @@ public abstract class Unit : MonoBehaviour
         Debug.Log("Change state to" + m_CurrentStance.ToString());
     }
 
-    public void MoveTo(Vector3 destination)
+    public void MoveTo(Vector3 destination, DestinationSource source = DestinationSource.CodeTriggered)
     {
         var direction = (destination - transform.position).normalized;
         m_SpriteRenderer.flipX = direction.x < 0;
 
         m_AIPawn.SetDestination(destination);
-        OnSetDestination();
+        OnSetDestination(source);
     }
 
     public void Select()
@@ -153,7 +159,7 @@ public abstract class Unit : MonoBehaviour
         return transform.position + Vector3.up * m_Collider.size.y / 2;
     }
 
-    protected virtual void OnSetDestination()
+    protected virtual void OnSetDestination(DestinationSource source)
     {
 
     }
@@ -167,10 +173,10 @@ public abstract class Unit : MonoBehaviour
     {
         CurrentState = newState;
     }
-    
+
     protected virtual void OnDestinationReached()
     {
-        
+
     }
 
     public virtual void RegisterUnit()

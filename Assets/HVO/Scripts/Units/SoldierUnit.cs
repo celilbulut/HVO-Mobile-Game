@@ -16,11 +16,15 @@ public class SoldierUnit : HumanoidUnit
         base.OnSetTask(oldTask, newTask);
     }
 
-    protected override void OnSetDestination()
+    protected override void OnSetDestination(DestinationSource source)
     {
-        if (HasTarget && (CurrentTask == UnitTask.Attack || CurrentState == UnitState.Attacking))
+        if (
+            HasTarget
+            && source == DestinationSource.PlayerClick
+            && (CurrentTask == UnitTask.Attack || CurrentState == UnitState.Attacking))
         {
-            m_IsRetreating = true;
+            m_IsRetreating = true;            
+            Debug.Log("Retreating!");
         }
 
         if (CurrentTask == UnitTask.Attack)
@@ -51,12 +55,12 @@ public class SoldierUnit : HumanoidUnit
                 // Ve hedef menzildeyse
                 if (IsTargetInRange(Target.transform))
                 {
-                    // Hareketi durdur ve saldırı durumuna geç
-                    StopMovement();
-                    SetState(UnitState.Attacking);
+                    StopMovement(); // Menzildeyse dur
+                    SetState(UnitState.Attacking); // Saldırıya geç
                 }
                 else if(CurrentStance == UnitStance.Offensive)
                 {
+                    // Menzilde değilse ama "offensive" ise kovala
                     MoveTo(Target.transform.position);
                 }
             }
@@ -64,6 +68,7 @@ public class SoldierUnit : HumanoidUnit
             {
                 if (CurrentStance == UnitStance.Offensive)
                 {
+                    // Geri çekilmiyorsak en yakın düşmanı bul, hedef olarak ata ve saldır
                     if (!m_IsRetreating && TryFindClosestFoe(out var foe))
                     {
                         SetTarget(foe);
