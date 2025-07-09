@@ -55,14 +55,21 @@ public class SoldierUnit : HumanoidUnit
                     StopMovement();
                     SetState(UnitState.Attacking);
                 }
+                else if(CurrentStance == UnitStance.Offensive)
+                {
+                    MoveTo(Target.transform.position);
+                }
             }
             else
             {
-                if (!m_IsRetreating && TryFindClosestFoe(out var foe))
+                if (CurrentStance == UnitStance.Offensive)
                 {
-                    SetTarget(foe);
-                    SetTask(UnitTask.Attack);
-                }
+                    if (!m_IsRetreating && TryFindClosestFoe(out var foe))
+                    {
+                        SetTarget(foe);
+                        SetTask(UnitTask.Attack);
+                    }
+                }                
             }
         }
         // Eğer birim saldırı halindeyse
@@ -79,7 +86,15 @@ public class SoldierUnit : HumanoidUnit
                 // Hedef menzilden çıktıysa, idle durumuna dön (takip için)
                 else
                 {
-                    SetState(UnitState.Idle);
+                    if (CurrentStance == UnitStance.Defensive)
+                    {
+                        SetTarget(null);
+                        SetState(UnitState.Idle);
+                    }
+                    else
+                    {
+                        MoveTo(Target.transform.position);
+                    }
                 }
             }
             // Hedef yoksa, idle durumuna geç
