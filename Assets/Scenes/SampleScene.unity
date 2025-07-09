@@ -5333,7 +5333,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 656c473e1d76cac4c844534896ca508d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_Actions: []
+  m_Actions:
+  - {fileID: 11400000, guid: e8f7489595eca0d49a0c0e07c917dd70, type: 2}
+  - {fileID: 11400000, guid: 8de60c0fa1f75c14c9dcf3350fe3b437, type: 2}
   m_ObjectDetectionRadius: 5
   m_UnitDetectionCheckRate: 0.5
   m_AttackRange: 1
