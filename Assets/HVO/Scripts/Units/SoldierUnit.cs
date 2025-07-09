@@ -23,15 +23,11 @@ public class SoldierUnit : HumanoidUnit
             && source == DestinationSource.PlayerClick
             && (CurrentTask == UnitTask.Attack || CurrentState == UnitState.Attacking))
         {
-            m_IsRetreating = true;            
+            m_IsRetreating = true;
+            SetTarget(null);
+            SetTask(UnitTask.None);
             Debug.Log("Retreating!");
         }
-
-        if (CurrentTask == UnitTask.Attack)
-            {
-                SetTask(UnitTask.None);
-                SetTarget(null);
-            }
     }
 
     protected override void OnDestinationReached()
