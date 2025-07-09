@@ -46,6 +46,7 @@ public abstract class Unit : MonoBehaviour
     protected float m_NextUnitDetectionTime;
     protected float m_NextAutoAttackTime;
     protected int m_CurrentHealth;
+    protected UnitStance m_CurrentStance = UnitStance.Offensive;
 
     public ActionSO[] Actions => m_Actions;
     public SpriteRenderer Renderer => m_SpriteRenderer;
@@ -59,6 +60,7 @@ public abstract class Unit : MonoBehaviour
 
     public bool HasTarget => Target != null;
     public int CurrentHealth => m_CurrentHealth;
+    public UnitStance CurrentStance => m_CurrentStance;
 
     protected virtual void Start()
     {
@@ -110,6 +112,12 @@ public abstract class Unit : MonoBehaviour
     public void SetTarget(Unit target)
     {
         Target = target;
+    }
+
+    public virtual void SetStance(UnitStanceActionSO stanceActionSO)
+    {
+        m_CurrentStance = stanceActionSO.UnitStance;
+        Debug.Log("Change state to" + m_CurrentStance.ToString());
     }
 
     public void MoveTo(Vector3 destination)

@@ -387,6 +387,7 @@ public class GameManager : SingletonManager<GameManager>
         {
             GUI.Label(new Rect(50, 120, 200, 20), "State: " + ActiveUnit.CurrentState.ToString(), new GUIStyle { fontSize = 40 });
             GUI.Label(new Rect(50, 160, 200, 20), "Task: " + ActiveUnit.CurrentTask.ToString(), new GUIStyle { fontSize = 40 });
+            GUI.Label(new Rect(50, 200, 200, 20), "Stance: " + ActiveUnit.CurrentStance.ToString(), new GUIStyle { fontSize = 40 });
         }
     }
 }
