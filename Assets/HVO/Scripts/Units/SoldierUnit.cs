@@ -4,6 +4,18 @@ public class SoldierUnit : HumanoidUnit
 {
     private bool m_IsRetreating = false;
 
+    public override void SetStance(UnitStanceActionSO stanceActionSO)
+    {
+        base.SetStance(stanceActionSO);
+
+        if (CurrentStance == UnitStance.Defensive)
+        {
+            SetState(UnitState.Idle);
+            StopMovement();
+            m_IsRetreating = false;
+        }
+    }
+
     protected override void OnSetTask(UnitTask oldTask, UnitTask newTask)
     {
         // Eğer yeni görev "Attack" ise ve geçerli bir hedef varsa
@@ -54,7 +66,7 @@ public class SoldierUnit : HumanoidUnit
                     StopMovement(); // Menzildeyse dur
                     SetState(UnitState.Attacking); // Saldırıya geç
                 }
-                else if(CurrentStance == UnitStance.Offensive)
+                else if (CurrentStance == UnitStance.Offensive)
                 {
                     // Menzilde değilse ama "offensive" ise kovala
                     MoveTo(Target.transform.position);
@@ -70,7 +82,7 @@ public class SoldierUnit : HumanoidUnit
                         SetTarget(foe);
                         SetTask(UnitTask.Attack);
                     }
-                }                
+                }
             }
         }
         // Eğer birim saldırı halindeyse

@@ -123,7 +123,6 @@ public abstract class Unit : MonoBehaviour
     public virtual void SetStance(UnitStanceActionSO stanceActionSO)
     {
         m_CurrentStance = stanceActionSO.UnitStance;
-        Debug.Log("Change state to" + m_CurrentStance.ToString());
     }
 
     public void MoveTo(Vector3 destination, DestinationSource source = DestinationSource.CodeTriggered)
@@ -250,8 +249,13 @@ public abstract class Unit : MonoBehaviour
 
         m_CurrentHealth -= damage;
 
+        if (!HasTarget)
+        {
+            SetTarget(damager);
+        }
+
         // Cikan damage yazisinin ayari
-        m_GameManager.ShowTextPopup(
+            m_GameManager.ShowTextPopup(
             damage.ToString(),
             GetTopPosition(),
             Color.red
