@@ -317,6 +317,8 @@ public class GameManager : SingletonManager<GameManager>
                 () => action.Execute(this)
             );
         }
+
+        m_ActionBar.FocusAction(1);
     }
 
     void ClearActionBarUI()

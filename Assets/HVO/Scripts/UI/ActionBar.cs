@@ -33,6 +33,18 @@ public class ActionBar : MonoBehaviour
         }
     }
 
+    public void FocusAction(int idx)
+    {
+        if (idx < 0 || idx >= m_ActionButtons.Count) return;
+
+        foreach (var Button in m_ActionButtons)
+        {
+            Button.UnFocus();
+        }
+
+        m_ActionButtons[idx].Focus();
+    }
+
     public void Show()
     {
         m_BackgroundImage.color = m_OriginalBackgroundColor;
