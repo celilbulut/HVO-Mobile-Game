@@ -193,6 +193,11 @@ public class GameManager : SingletonManager<GameManager>
         }
     }
 
+    public void FocusActionUI(int idx)
+    {
+        m_ActionBar.FocusAction(idx);
+    }
+
     bool HasClickedOnUnit(RaycastHit2D hit, out Unit unit)
     {
         if (hit.collider != null && hit.collider.TryGetComponent<Unit>(out var clickedUnit))
@@ -317,8 +322,6 @@ public class GameManager : SingletonManager<GameManager>
                 () => action.Execute(this)
             );
         }
-
-        m_ActionBar.FocusAction(1);
     }
 
     void ClearActionBarUI()
