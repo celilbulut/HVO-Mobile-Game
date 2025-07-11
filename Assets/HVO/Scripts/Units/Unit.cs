@@ -54,6 +54,8 @@ public abstract class Unit : MonoBehaviour
     protected int m_CurrentHealth;
     protected UnitStance m_CurrentStance = UnitStance.Offensive;
 
+    private Coroutine m_FlashCoroutine;
+
     public ActionSO[] Actions => m_Actions;
     public SpriteRenderer Renderer => m_SpriteRenderer;
 
@@ -123,6 +125,15 @@ public abstract class Unit : MonoBehaviour
     public virtual void SetStance(UnitStanceActionSO stanceActionSO)
     {
         m_CurrentStance = stanceActionSO.UnitStance;
+
+        for (int i = 0; i < m_Actions.Length; i++)
+        {
+            if (m_Actions[i] == stanceActionSO)
+            {
+                m_GameManager.FocusActionUI(i);
+                return;
+            }
+        }
     }
 
     public void MoveTo(Vector3 destination, DestinationSource source = DestinationSource.CodeTriggered)
@@ -138,6 +149,15 @@ public abstract class Unit : MonoBehaviour
     {
         Highlight();
         IsTarget = true;
+
+        for (int i = 0; i < m_Actions.Length; i++)
+        {
+            if (m_Actions[i] is UnitStanceActionSO stanceActionSO && stanceActionSO.UnitStance == m_CurrentStance)
+            {
+                m_GameManager.FocusActionUI(i);
+                return;
+            }
+        }
     }
 
     public void DeSelect()
@@ -243,6 +263,7 @@ public abstract class Unit : MonoBehaviour
         UnRegisterUnit();
     }
 
+
     protected virtual void TakeDamage(int damage, Unit damager)
     {
         if (CurrentState == UnitState.Dead) return;
@@ -255,14 +276,17 @@ public abstract class Unit : MonoBehaviour
         }
 
         // Cikan damage yazisinin ayari
-            m_GameManager.ShowTextPopup(
+        m_GameManager.ShowTextPopup(
             damage.ToString(),
             GetTopPosition(),
             Color.red
         );
 
-        // Hasar alinca kirmizi yanip sonmesi icin olusturdugumuz flash effect
-        StartCoroutine(FlashEffect(0.2f, 2, m_DamageFlashColor));
+        if (m_FlashCoroutine == null)
+        {
+            // Hasar alinca kirmizi yanip sonmesi icin olusturdugumuz flash effect
+            m_FlashCoroutine = StartCoroutine(FlashEffect(0.2f, 2, m_DamageFlashColor));
+        }        
 
         if (m_CurrentHealth <= 0)
         {
@@ -283,6 +307,9 @@ public abstract class Unit : MonoBehaviour
             m_SpriteRenderer.color = originalColor;
             yield return new WaitForSeconds(duration / 2f);
         }
+
+        m_SpriteRenderer.color = originalColor;
+        m_FlashCoroutine = null;
     }
 
     protected IEnumerator DelayDamage(float delay, int damage, Unit target)

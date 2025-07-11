@@ -136,6 +136,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_IconImage: {fileID: 5100913450345228342}
   m_Button: {fileID: 8490541690830668697}
+  m_ButtonImage: {fileID: 61842486958689045}
+  m_ButtonFocusedSprite: {fileID: 21300000, guid: 3b242546606610a40b084a05667d76e8, type: 3}
+  m_ButtonDefaultSprite: {fileID: 21300000, guid: b578f874a1bf13b4d9a3718a2218eb98, type: 3}
 --- !u!1 &4681896865690313833
 GameObject:
   m_ObjectHideFlags: 0
