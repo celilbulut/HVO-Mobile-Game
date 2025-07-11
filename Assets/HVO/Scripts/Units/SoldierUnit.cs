@@ -4,6 +4,18 @@ public class SoldierUnit : HumanoidUnit
 {
     private bool m_IsRetreating = false;
 
+    public override void SetStance(UnitStanceActionSO stanceActionSO)
+    {
+        base.SetStance(stanceActionSO);
+
+        if (CurrentStance == UnitStance.Defensive)
+        {
+            SetState(UnitState.Idle);
+            StopMovement();
+            m_IsRetreating = false;
+        }
+    }
+
     protected override void OnSetTask(UnitTask oldTask, UnitTask newTask)
     {
         // Eğer yeni görev "Attack" ise ve geçerli bir hedef varsa
@@ -16,18 +28,18 @@ public class SoldierUnit : HumanoidUnit
         base.OnSetTask(oldTask, newTask);
     }
 
-    protected override void OnSetDestination()
+    protected override void OnSetDestination(DestinationSource source)
     {
-        if (HasTarget && (CurrentTask == UnitTask.Attack || CurrentState == UnitState.Attacking))
+        if (
+            HasTarget
+            && source == DestinationSource.PlayerClick
+            && (CurrentTask == UnitTask.Attack || CurrentState == UnitState.Attacking))
         {
             m_IsRetreating = true;
+            SetTarget(null);
+            SetTask(UnitTask.None);
+            Debug.Log("Retreating!");
         }
-
-        if (CurrentTask == UnitTask.Attack)
-            {
-                SetTask(UnitTask.None);
-                SetTarget(null);
-            }
     }
 
     protected override void OnDestinationReached()
@@ -51,17 +63,25 @@ public class SoldierUnit : HumanoidUnit
                 // Ve hedef menzildeyse
                 if (IsTargetInRange(Target.transform))
                 {
-                    // Hareketi durdur ve saldırı durumuna geç
-                    StopMovement();
-                    SetState(UnitState.Attacking);
+                    StopMovement(); // Menzildeyse dur
+                    SetState(UnitState.Attacking); // Saldırıya geç
+                }
+                else if (CurrentStance == UnitStance.Offensive)
+                {
+                    // Menzilde değilse ama "offensive" ise kovala
+                    MoveTo(Target.transform.position);
                 }
             }
             else
             {
-                if (!m_IsRetreating && TryFindClosestFoe(out var foe))
+                if (CurrentStance == UnitStance.Offensive)
                 {
-                    SetTarget(foe);
-                    SetTask(UnitTask.Attack);
+                    // Geri çekilmiyorsak en yakın düşmanı bul, hedef olarak ata ve saldır
+                    if (!m_IsRetreating && TryFindClosestFoe(out var foe))
+                    {
+                        SetTarget(foe);
+                        SetTask(UnitTask.Attack);
+                    }
                 }
             }
         }
@@ -79,7 +99,15 @@ public class SoldierUnit : HumanoidUnit
                 // Hedef menzilden çıktıysa, idle durumuna dön (takip için)
                 else
                 {
-                    SetState(UnitState.Idle);
+                    if (CurrentStance == UnitStance.Defensive)
+                    {
+                        SetTarget(null);
+                        SetState(UnitState.Idle);
+                    }
+                    else
+                    {
+                        MoveTo(Target.transform.position);
+                    }
                 }
             }
             // Hedef yoksa, idle durumuna geç

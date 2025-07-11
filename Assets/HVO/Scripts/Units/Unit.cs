@@ -21,6 +21,12 @@ public enum UnitTask
     Attack,
 }
 
+public enum DestinationSource
+{
+    CodeTriggered,
+    PlayerClick
+}
+
 public abstract class Unit : MonoBehaviour
 {
     [SerializeField] private ActionSO[] m_Actions;
@@ -46,19 +52,21 @@ public abstract class Unit : MonoBehaviour
     protected float m_NextUnitDetectionTime;
     protected float m_NextAutoAttackTime;
     protected int m_CurrentHealth;
+    protected UnitStance m_CurrentStance = UnitStance.Offensive;
 
     public ActionSO[] Actions => m_Actions;
     public SpriteRenderer Renderer => m_SpriteRenderer;
 
     public UnitState CurrentState { get; protected set; } = UnitState.Idle;
     public UnitTask CurrentTask { get; protected set; } = UnitTask.None;
-    public Unit Target {get; protected set;}
+    public Unit Target { get; protected set; }
 
     public virtual bool IsPlayer => true;
     public virtual bool IsBuilding => false;
 
     public bool HasTarget => Target != null;
     public int CurrentHealth => m_CurrentHealth;
+    public UnitStance CurrentStance => m_CurrentStance;
 
     protected virtual void Start()
     {
@@ -112,13 +120,18 @@ public abstract class Unit : MonoBehaviour
         Target = target;
     }
 
-    public void MoveTo(Vector3 destination)
+    public virtual void SetStance(UnitStanceActionSO stanceActionSO)
+    {
+        m_CurrentStance = stanceActionSO.UnitStance;
+    }
+
+    public void MoveTo(Vector3 destination, DestinationSource source = DestinationSource.CodeTriggered)
     {
         var direction = (destination - transform.position).normalized;
         m_SpriteRenderer.flipX = direction.x < 0;
 
         m_AIPawn.SetDestination(destination);
-        OnSetDestination();
+        OnSetDestination(source);
     }
 
     public void Select()
@@ -145,7 +158,7 @@ public abstract class Unit : MonoBehaviour
         return transform.position + Vector3.up * m_Collider.size.y / 2;
     }
 
-    protected virtual void OnSetDestination()
+    protected virtual void OnSetDestination(DestinationSource source)
     {
 
     }
@@ -159,10 +172,10 @@ public abstract class Unit : MonoBehaviour
     {
         CurrentState = newState;
     }
-    
+
     protected virtual void OnDestinationReached()
     {
-        
+
     }
 
     public virtual void RegisterUnit()
@@ -236,8 +249,13 @@ public abstract class Unit : MonoBehaviour
 
         m_CurrentHealth -= damage;
 
+        if (!HasTarget)
+        {
+            SetTarget(damager);
+        }
+
         // Cikan damage yazisinin ayari
-        m_GameManager.ShowTextPopup(
+            m_GameManager.ShowTextPopup(
             damage.ToString(),
             GetTopPosition(),
             Color.red

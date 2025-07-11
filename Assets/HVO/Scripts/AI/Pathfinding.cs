@@ -52,7 +52,6 @@ public class Pathfinding
             return m_Grid[gridX, gridY];
         }
 
-        Debug.Log($"Node not found at position: {position}");
         return null;
     }
 
