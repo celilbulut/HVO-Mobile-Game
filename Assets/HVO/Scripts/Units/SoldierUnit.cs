@@ -48,7 +48,6 @@ public class SoldierUnit : HumanoidUnit
             m_IsRetreating = true;
             SetTarget(null);
             SetTask(UnitTask.None);
-            Debug.Log("Retreating!");
         }
     }
 
