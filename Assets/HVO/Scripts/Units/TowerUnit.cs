@@ -4,15 +4,24 @@ public class TowerUnit : StructureUnit
 {
     [SerializeField] private Projectile m_ProjectilePrefab;
 
+    public override bool IsPlayer => true;
+
     public override void OnConstructionFinished()
     {
         base.OnConstructionFinished();
-
-        var Projectile = Instantiate(m_ProjectilePrefab, transform.position, Quaternion.identity);
     }
 
     protected override void AfterConstructionUpdate()
     {
-        Debug.Log("AfterConstructionUpdate!");
+        if (TryFindClosestFoe(out var foe))
+        {
+            Attack(foe);
+        }
+    }
+
+    void Attack(Unit target)
+    {
+        var Projectile = Instantiate(m_ProjectilePrefab, transform.position, Quaternion.identity);
+        Projectile.Initialize(this, target);
     }
 }
