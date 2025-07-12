@@ -18,7 +18,7 @@ public class EnemyUnit : HumanoidUnit
                 // Eğer hedef varsa: menzile girmişse saldır, girmemişse yaklaş
                 if (HasTarget)
                 {
-                    if (IsTargetInRange(Target.transform))
+                    if (IsTargetInRange(Target))
                     {
                         SetState(UnitState.Attacking);
                         StopMovement(); // Hareket anında durur
@@ -43,7 +43,7 @@ public class EnemyUnit : HumanoidUnit
                 // Değilse: tekrar hareket et veya hedefi kaybet
                 if (HasTarget)
                 {
-                    if (IsTargetInRange(Target.transform))
+                    if (IsTargetInRange(Target))
                     {
                         m_CurrentAttackCommitmentTime = m_AttackCommitmentTime;
                         TryAttackCurrentTarget(); // Artık cooldown’a göre çalışıyor                        
