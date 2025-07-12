@@ -1,3 +1,4 @@
+using System.Collections;
 using UnityEngine;
 
 public class TowerUnit : StructureUnit
@@ -13,6 +14,8 @@ public class TowerUnit : StructureUnit
 
     protected override void AfterConstructionUpdate()
     {
+        if (CurrentState == UnitState.Dead) return;
+
         if (TryFindClosestFoe(out var foe))
         {
             SetTarget(foe);
@@ -24,5 +27,23 @@ public class TowerUnit : StructureUnit
     {
         var Projectile = Instantiate(m_ProjectilePrefab, transform.position, Quaternion.identity);
         Projectile.Initialize(this, target, m_AutoAttackDamage);
+    }
+
+    protected override void RunDeadEffect()
+    {
+        StartCoroutine(FadeOut());
+    }
+
+    private IEnumerator FadeOut()
+    {
+        float alpha = 1;
+        while (alpha > 0)
+        {
+            alpha -= Time.deltaTime;
+            m_SpriteRenderer.color = new Color(1, 1, 1, alpha);
+            yield return null;
+        }
+
+        Destroy(gameObject);
     }
 }

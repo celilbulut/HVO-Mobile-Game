@@ -265,7 +265,12 @@ public abstract class Unit : MonoBehaviour
     protected virtual void Die()
     {
         SetState(UnitState.Dead);
-        StopMovement();
+
+        if (m_AIPawn != null)
+        {
+            StopMovement();            
+        }
+        
         RunDeadEffect();
         UnRegisterUnit();
     }
