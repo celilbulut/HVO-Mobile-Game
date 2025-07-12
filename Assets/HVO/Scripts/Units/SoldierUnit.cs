@@ -104,6 +104,7 @@ public class SoldierUnit : HumanoidUnit
                 if (IsTargetInRange(Target))
                 {
                     TryAttackCurrentTarget();
+                    StopMovement(); // Menzildeyse dur
                 }
                 // Hedef menzilden çıktıysa, idle durumuna dön (takip için)
                 else

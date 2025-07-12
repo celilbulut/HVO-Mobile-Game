@@ -1,6 +1,6 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
---- !u!1 &4594906964495286597
+--- !u!1 &1452033651885257825
 GameObject:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -8,41 +8,41 @@ GameObject:
   m_PrefabAsset: {fileID: 0}
   serializedVersion: 6
   m_Component:
-  - component: {fileID: 9204462443873921394}
-  - component: {fileID: 6288023143961384959}
-  - component: {fileID: 8280907009282771675}
-  - component: {fileID: 5260986639979650697}
-  - component: {fileID: 818723705002914365}
-  - component: {fileID: 7675755507348766072}
-  m_Layer: 0
-  m_Name: Dynamite
+  - component: {fileID: 3534110922410648208}
+  - component: {fileID: 7988816719901974652}
+  - component: {fileID: 102421800117738314}
+  - component: {fileID: 2650697900848962007}
+  - component: {fileID: 4345119135886554717}
+  - component: {fileID: 4952865012997112413}
+  m_Layer: 6
+  m_Name: Worker
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!4 &9204462443873921394
+--- !u!4 &3534110922410648208
 Transform:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4594906964495286597}
+  m_GameObject: {fileID: 1452033651885257825}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -8.01, y: 3.07, z: 0}
+  m_LocalPosition: {x: -1.72, y: -4, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!212 &6288023143961384959
+--- !u!212 &7988816719901974652
 SpriteRenderer:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4594906964495286597}
+  m_GameObject: {fileID: 1452033651885257825}
   m_Enabled: 1
   m_CastShadows: 0
   m_ReceiveShadows: 0
@@ -79,29 +79,29 @@ SpriteRenderer:
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: 0
   m_SortingLayer: 0
-  m_SortingOrder: 100
-  m_Sprite: {fileID: -4003982261762975687, guid: 789e953076af6764bbc2e72b431b0914, type: 3}
+  m_SortingOrder: 25
+  m_Sprite: {fileID: -2526443156231494169, guid: 5920ede447481094197c8a1dcdc2f925, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
-  m_Size: {x: 1, y: 1}
+  m_Size: {x: 3, y: 3}
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
---- !u!95 &8280907009282771675
+--- !u!95 &102421800117738314
 Animator:
   serializedVersion: 7
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4594906964495286597}
+  m_GameObject: {fileID: 1452033651885257825}
   m_Enabled: 1
   m_Avatar: {fileID: 0}
-  m_Controller: {fileID: 9100000, guid: ee34358b1edf1e84d8d5c320340db48f, type: 2}
+  m_Controller: {fileID: 9100000, guid: 27b9806981663bf49bbcf267a92e9e94, type: 2}
   m_CullingMode: 0
   m_UpdateMode: 0
   m_ApplyRootMotion: 0
@@ -113,13 +113,13 @@ Animator:
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
   m_WriteDefaultValuesOnDisable: 0
---- !u!61 &5260986639979650697
-BoxCollider2D:
+--- !u!70 &2650697900848962007
+CapsuleCollider2D:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4594906964495286597}
+  m_GameObject: {fileID: 1452033651885257825}
   m_Enabled: 1
   serializedVersion: 3
   m_Density: 1
@@ -143,60 +143,49 @@ BoxCollider2D:
   m_CallbackLayers:
     serializedVersion: 2
     m_Bits: 4294967295
-  m_IsTrigger: 1
+  m_IsTrigger: 0
   m_UsedByEffector: 0
   m_CompositeOperation: 0
   m_CompositeOrder: 0
-  m_Offset: {x: -0.003232956, y: 0.016165495}
-  m_SpriteTilingProperty:
-    border: {x: 0, y: 0, z: 0, w: 0}
-    pivot: {x: 0.5, y: 0.5}
-    oldSize: {x: 1, y: 1}
-    newSize: {x: 1, y: 1}
-    adaptiveTilingThreshold: 0.5
-    drawMode: 0
-    adaptiveTiling: 0
-  m_AutoTiling: 0
-  m_Size: {x: 0.43744087, y: 0.5021033}
-  m_EdgeRadius: 0
---- !u!50 &818723705002914365
-Rigidbody2D:
-  serializedVersion: 5
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4594906964495286597}
-  m_BodyType: 1
-  m_Simulated: 1
-  m_UseFullKinematicContacts: 0
-  m_UseAutoMass: 0
-  m_Mass: 1
-  m_LinearDamping: 0
-  m_AngularDamping: 0.05
-  m_GravityScale: 1
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_Interpolate: 0
-  m_SleepingMode: 1
-  m_CollisionDetection: 0
-  m_Constraints: 0
---- !u!114 &7675755507348766072
+  m_Offset: {x: -0.012360334, y: -0.0494408}
+  m_Size: {x: 0.9482026, y: 1.1459666}
+  m_Direction: 0
+--- !u!114 &4345119135886554717
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4594906964495286597}
+  m_GameObject: {fileID: 1452033651885257825}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c84c69450d7cec84da66a6b9211daf73, type: 3}
+  m_Script: {fileID: 11500000, guid: d5c1a29dec9445742a47e599aed4affe, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_Speed: 10
-  m_EnableDynamiteRotation: 1
+  m_Speed: 3
+  m_SeperationRadius: 1
+  m_SeperationForce: 0.5
+  m_ApplySeperation: 0
+--- !u!114 &4952865012997112413
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1452033651885257825}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 83cd5861061d96b42b9f5f3fd363b6ff, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Actions:
+  - {fileID: 11400000, guid: f8e4ef3a3ae8b474895a0c8d00395e6b, type: 2}
+  m_ObjectDetectionRadius: 1
+  m_UnitDetectionCheckRate: 0.5
+  m_AttackRange: 0.8
+  m_AutoAttackFrequency: 1.5
+  m_AutoAttackDamageDelay: 0.5
+  m_AutoAttackDamage: 7
+  m_Health: 8
+  m_DamageFlashColor: {r: 1, g: 0.63529414, b: 0.627451, a: 1}
+  IsTarget: 0
