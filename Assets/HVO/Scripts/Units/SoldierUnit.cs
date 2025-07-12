@@ -48,7 +48,6 @@ public class SoldierUnit : HumanoidUnit
             m_IsRetreating = true;
             SetTarget(null);
             SetTask(UnitTask.None);
-            Debug.Log("Retreating!");
         }
     }
 
@@ -71,7 +70,7 @@ public class SoldierUnit : HumanoidUnit
             if (HasTarget)
             {
                 // Ve hedef menzildeyse
-                if (IsTargetInRange(Target.transform))
+                if (IsTargetInRange(Target))
                 {
                     StopMovement(); // Menzildeyse dur
                     SetState(UnitState.Attacking); // Saldırıya geç
@@ -102,7 +101,7 @@ public class SoldierUnit : HumanoidUnit
             if (HasTarget)
             {
                 // Ve hedef hâlâ menzildeyse saldır
-                if (IsTargetInRange(Target.transform))
+                if (IsTargetInRange(Target))
                 {
                     TryAttackCurrentTarget();
                 }
