@@ -16,11 +16,17 @@ public class TowerUnit : StructureUnit
     {
         if (CurrentState == UnitState.Dead) return;
 
-        if (TryFindClosestFoe(out var foe))
+        if (HasTarget)
         {
-            SetTarget(foe);
             TryAttackCurrentTarget();
         }
+        else
+        {
+            if (TryFindClosestFoe(out var foe))
+            {
+                SetTarget(foe);
+            }
+        }        
     }
 
     protected override void OnAttackReady(Unit target)
