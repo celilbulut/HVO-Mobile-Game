@@ -260,12 +260,13 @@ public abstract class Unit : MonoBehaviour
     protected virtual void Die()
     {
         SetState(UnitState.Dead);
+        StopMovement();
         RunDeadEffect();
         UnRegisterUnit();
     }
 
 
-    protected virtual void TakeDamage(int damage, Unit damager)
+    public virtual void TakeDamage(int damage, Unit damager)
     {
         if (CurrentState == UnitState.Dead) return;
 
