@@ -177,26 +177,46 @@ public class GameManager : SingletonManager<GameManager>
         Vector2 worldPoint = Camera.main.ScreenToWorldPoint(inputPosition);
         RaycastHit2D hit = Physics2D.Raycast(worldPoint, Vector2.zero);
 
-        if (HasClickedOnUnit(hit, out var unit))
+        if (WorkerHasClickOnTree(hit))
         {
-            if (unit.IsPlayer)
+            Debug.Log("Clicking on tree");
+        }
+
+        if (HasClickedOnUnit(hit, out var unit))
             {
-                HandleClickOnPlayerUnit(unit);
+                if (unit.IsPlayer)
+                {
+                    HandleClickOnPlayerUnit(unit);
+                }
+                else
+                {
+                    HandleClickOnEnemy(unit);
+                }
             }
             else
             {
-                HandleClickOnEnemy(unit);
+                HandleClickOnGround(worldPoint);
             }
-        }
-        else
-        {
-            HandleClickOnGround(worldPoint);
-        }
     }
 
     public void FocusActionUI(int idx)
     {
         m_ActionBar.FocusAction(idx);
+    }
+
+    bool WorkerHasClickOnTree(RaycastHit2D hit)
+    {
+        if (hit.collider != null)
+        {
+            var treeLayerMask = LayerMask.GetMask("Tree");
+            if (HasActiveUnit &&
+                ActiveUnit is WorkerUnit &&
+                ((1 << hit.collider.gameObject.layer & treeLayerMask) != 0))
+            {
+                return true;
+            }
+        }
+        return false;
     }
 
     bool HasClickedOnUnit(RaycastHit2D hit, out Unit unit)
