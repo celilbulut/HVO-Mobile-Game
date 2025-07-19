@@ -137,16 +137,30 @@ public class WorkerUnit : HumanoidUnit
         }
 
         if (m_ChoppingTimer >= m_WoodGatherTickTime)
-            {
-                m_WoodCollected += m_WoodPerTick;
-                m_ChoppingTimer = 0;
+        {
+            m_WoodCollected += m_WoodPerTick;
+            m_ChoppingTimer = 0;
 
-                if (m_WoodCollected == m_WoodCapacity)
-                {
-                    m_Animator.SetBool("IsChopping", false);
-                    SetState(UnitState.Idle);
-                }
+            if (m_WoodCollected == m_WoodCapacity)
+            {
+                HandleChopingFinished();
             }
+        }
+    }
+
+    void HandleChopingFinished()
+    {
+        m_Animator.SetBool("IsChopping", false);
+
+        var storage = m_GameManager.FindClosestWoodStorage(transform.position);
+
+        if (storage != null)
+        {
+            MoveTo(storage.transform.position);
+        }
+
+        SetState(UnitState.Idle);
+        SetTask(UnitTask.ReturnResource);
     }
 
     void CheckForConstruction()
