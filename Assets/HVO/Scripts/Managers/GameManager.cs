@@ -1,21 +1,23 @@
 
 using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
 
 public enum ClickType
 {
     Move,
     Attack,
-    Build
+    Build,
+    Chop
 }
 
 public class GameManager : SingletonManager<GameManager>
 {
     [Header("UI")]
     [SerializeField] private PointToClick m_PointToMovePrefab; //Click to move yaptik
-    [SerializeField] private PointToClick m_PointToBuildPrefab;
-    [SerializeField] private PointToClick m_PointToAttackPrefab;
+    [SerializeField] private PointToClick m_PointToBuildPrefab; //Click to Building
+    [SerializeField] private PointToClick m_PointToAttackPrefab; //Click to Attack
+    [SerializeField] private PointToClick m_PointToChopPrefab; //Click to Chop
+
     [SerializeField] private ActionBar m_ActionBar;
     [SerializeField] private ConfirmationBar m_BuildConfirmationBar;
     [SerializeField] private TextPopupController m_TextPopupController;
@@ -177,26 +179,28 @@ public class GameManager : SingletonManager<GameManager>
         Vector2 worldPoint = Camera.main.ScreenToWorldPoint(inputPosition);
         RaycastHit2D hit = Physics2D.Raycast(worldPoint, Vector2.zero);
 
-        if (WorkerHasClickOnTree(hit))
+        if (WorkerHasClickOnTree(hit, out Tree tree)) // Agaca tiklama
         {
-            Debug.Log("Clicking on tree");
+            (ActiveUnit as WorkerUnit).SendToChop(tree);
+            DisplayClickEffect(tree.transform.position, ClickType.Chop);
+            return;
         }
 
         if (HasClickedOnUnit(hit, out var unit))
+        {
+            if (unit.IsPlayer)
             {
-                if (unit.IsPlayer)
-                {
-                    HandleClickOnPlayerUnit(unit);
-                }
-                else
-                {
-                    HandleClickOnEnemy(unit);
-                }
+                HandleClickOnPlayerUnit(unit);
             }
             else
             {
-                HandleClickOnGround(worldPoint);
+                HandleClickOnEnemy(unit);
             }
+        }
+        else
+        {
+            HandleClickOnGround(worldPoint);
+        }
     }
 
     public void FocusActionUI(int idx)
@@ -204,8 +208,10 @@ public class GameManager : SingletonManager<GameManager>
         m_ActionBar.FocusAction(idx);
     }
 
-    bool WorkerHasClickOnTree(RaycastHit2D hit)
+    bool WorkerHasClickOnTree(RaycastHit2D hit, out Tree tree)
     {
+        tree = null;
+
         if (hit.collider != null)
         {
             var treeLayerMask = LayerMask.GetMask("Tree");
@@ -213,9 +219,11 @@ public class GameManager : SingletonManager<GameManager>
                 ActiveUnit is WorkerUnit &&
                 ((1 << hit.collider.gameObject.layer & treeLayerMask) != 0))
             {
+                tree = hit.collider.GetComponent<Tree>();
                 return true;
             }
         }
+
         return false;
     }
 
@@ -322,6 +330,10 @@ public class GameManager : SingletonManager<GameManager>
         else if (clickType == ClickType.Attack)
         {
             Instantiate(m_PointToAttackPrefab, (Vector3)worldPoint, Quaternion.identity);
+        }
+        else if (clickType == ClickType.Chop)
+        {
+            Instantiate(m_PointToChopPrefab, (Vector3)worldPoint, Quaternion.identity);
         }
     }
 
