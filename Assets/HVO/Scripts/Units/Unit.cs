@@ -19,6 +19,7 @@ public enum UnitTask
     Chop,
     Mine,
     Attack,
+    ReturnResource
 }
 
 public enum DestinationSource

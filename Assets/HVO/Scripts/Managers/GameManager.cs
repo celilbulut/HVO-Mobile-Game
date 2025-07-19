@@ -29,9 +29,15 @@ public class GameManager : SingletonManager<GameManager>
     [Header("Visual Effect (VFX)")]
     [SerializeField] private ParticleSystem m_ConstructionEffectPrefab;
 
+    [Header("Resources")]
+    [SerializeField] private Transform m_TreeContainer;
+
+
     public Unit ActiveUnit;
 
+    private Tree[] m_Trees = new Tree[0];
     private List<Unit> m_PlayerUnits = new();
+    private List<StructureUnit> m_PlayerBuildings = new();
     private List<Unit> m_Enemies = new();
 
     private CameraController m_CameraController;
@@ -66,10 +72,17 @@ public class GameManager : SingletonManager<GameManager>
     }
 
     public void RegisterUnit(Unit unit)
-    {
+    {        
         if (unit.IsPlayer)
         {
-            m_PlayerUnits.Add(unit);
+            if (unit.IsBuilding)
+            {
+                m_PlayerBuildings.Add(unit as StructureUnit);
+            }
+            else
+            {
+                m_PlayerUnits.Add(unit);
+            }
         }
         else
         {
@@ -94,7 +107,15 @@ public class GameManager : SingletonManager<GameManager>
             }
 
             unit.StopMovement(); // Object öldüğünde hareket etmesini durduruyor.
-            m_PlayerUnits.Remove(unit);
+
+            if (unit.IsBuilding)
+            {
+                m_PlayerBuildings.Remove(unit as StructureUnit);
+            }
+            else
+            {
+                m_PlayerUnits.Remove(unit);
+            }
         }
         else
         {
@@ -105,6 +126,37 @@ public class GameManager : SingletonManager<GameManager>
     public void ShowTextPopup(string text, Vector3 position, Color color)
     {
         m_TextPopupController.Spawn(text, position, color);
+    }
+
+    public Tree FindClosestUnClaimedTree(Vector3 originPosition)
+    {
+        Tree closestTree = null;
+        float closestDistanceSqr = float.MaxValue;
+
+        if (m_Trees.Length == 0)
+        {
+            m_Trees = new Tree[m_TreeContainer.childCount];
+
+            for (int i = 0; i < m_TreeContainer.childCount; i++)
+            {
+                m_Trees[i] = m_TreeContainer.GetChild(i).GetComponent<Tree>();
+            }
+        }
+
+        foreach (var tree in m_Trees)
+        {
+            if (tree.Claimed) continue;
+
+            float sqrDistance = (tree.transform.position - originPosition).sqrMagnitude;
+
+            if (sqrDistance < closestDistanceSqr)
+            {
+                closestDistanceSqr = sqrDistance;
+                closestTree = tree;
+            }
+        }
+
+        return closestTree;
     }
 
     // GameManager içinde yer alan bu metot, verilen konumdan (originPosition)
@@ -145,6 +197,26 @@ public class GameManager : SingletonManager<GameManager>
         }
 
         // En yakın bulunan Unit (veya hiç bulunamadıysa null) döndürülür
+        return closestUnit;
+    }
+
+    public StructureUnit FindClosestWoodStorage(Vector3 originPoint)
+    {
+        float closestDistanceSqr = float.MaxValue;
+        StructureUnit closestUnit = null;
+
+        foreach (StructureUnit unit in m_PlayerBuildings)
+        {
+            if (unit.CurrentState == UnitState.Dead || !unit.CanStoreWood) continue;
+
+            float sqrDistance = (unit.transform.position - originPoint).sqrMagnitude;
+            if (sqrDistance < closestDistanceSqr)
+            {
+                closestUnit = unit;
+                closestDistanceSqr = sqrDistance;
+            }
+        }
+
         return closestUnit;
     }
 
@@ -256,15 +328,32 @@ public class GameManager : SingletonManager<GameManager>
                 CancelActiveUnit();
                 return;
             }
-            else if (WorkerClickedOnUnfinishedBuilding(unit))
+            else if (ActiveUnit is WorkerUnit worker)
             {
-                DisplayClickEffect(unit.transform.position, ClickType.Build);
-                ((WorkerUnit)ActiveUnit).SendToBuild(unit as StructureUnit);
-                return;
+                if (WorkerClickedOnUnfinishedBuilding(unit))
+                {
+                    DisplayClickEffect(unit.transform.position, ClickType.Build);
+                    worker.SendToBuild(unit as StructureUnit);
+                    return;
+                }
+                else if (worker.IsHoldingWood && WorkerClickOnWoodStorage(unit))
+                {
+                    var closestPoint = unit.Collider.ClosestPoint(worker.transform.position);
+                    worker.MoveTo(closestPoint, DestinationSource.PlayerClick);
+                    worker.SetTask(UnitTask.ReturnResource);
+                    worker.SetWoodStorage(unit as StructureUnit);
+                    DisplayClickEffect(unit.transform.position, ClickType.Build);
+                    return;
+                }
             }
         }
 
         SelectNewUnit(unit);
+    }
+
+    bool WorkerClickOnWoodStorage(Unit clickedUnit)
+    {
+        return (clickedUnit is StructureUnit structure) && structure.CanStoreWood;        
     }
 
     void HandleClickOnEnemy(Unit enemyUnit)
@@ -280,7 +369,6 @@ public class GameManager : SingletonManager<GameManager>
     bool WorkerClickedOnUnfinishedBuilding(Unit clickedUnit)
     {
         return
-            ActiveUnit is WorkerUnit &&
             clickedUnit is StructureUnit structure &&
             structure.IsUnderConstruction;
     }
