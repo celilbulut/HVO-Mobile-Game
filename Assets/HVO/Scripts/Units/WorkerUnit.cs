@@ -15,6 +15,11 @@ public class WorkerUnit : HumanoidUnit
         {
             HandleChoppingTask();
         }
+
+        if (CurrentState == UnitState.Chopping)
+        {
+            StartChopping();
+        }
     }
 
     protected override void OnSetDestination(DestinationSource source)
@@ -65,13 +70,12 @@ public class WorkerUnit : HumanoidUnit
         {
             StopMovement();
             SetState(UnitState.Chopping);
-            StartChopping();
         }
     }
 
     void StartChopping()
     {
-        Debug.Log("Chopping");
+        m_Animator.SetBool("IsChopping", true); // Isimlendirme onemli.
     }
 
     void CheckForConstruction()
@@ -101,6 +105,8 @@ public class WorkerUnit : HumanoidUnit
 
         //Isim onemli. Animasyondaki ismi tetikliyoruz buradan.
         m_Animator.SetBool("IsBuilding", false);
+        m_Animator.SetBool("IsChopping", false);
+
 
         if (m_AssignedTree != null)
         {
@@ -118,27 +124,3 @@ public class WorkerUnit : HumanoidUnit
         SetTarget(null);
     }
 }
-
-
-
-
-/*
-    void CheckForCloseObjects()
-    {
-        Debug.Log("Checking!");
-        var hits = RunProximityObjectDetection();
-
-        foreach(var hit in hits)
-        {
-            if (hit.gameObject == this.gameObject) continue;
-
-            if(CurrentTask == UnitTask.Build && hit.gameObject == Target.gameObject)
-            {
-                if (hit.TryGetComponent<StructureUnit>(out var unit))
-                {
-                    StartBuilding(unit);
-                }
-            }         
-        }
-    }
-*/
