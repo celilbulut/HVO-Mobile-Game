@@ -14,7 +14,7 @@ public class WorkerUnit : HumanoidUnit
     private float m_HitTreeTimer;
     private int m_WoodCollected;
     private int m_GoldCollected;
-    private int m_WoodCapacity = 5;
+    private int m_WoodCapacity = 10;
     private int m_GoldCapacity = 10;
 
     private Tree m_AssignedTree;
@@ -49,6 +49,8 @@ public class WorkerUnit : HumanoidUnit
 
             if (distance < 1f)
             {
+                m_GameManager.ShowTextPopup(m_WoodCollected.ToString(), GetTopPosition(), Color.green);
+                m_GameManager.AddResources(0, m_WoodCollected);
                 m_WoodCollected = 0;
                 TryMoveToClosestTree();
             }
