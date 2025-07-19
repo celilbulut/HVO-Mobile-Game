@@ -67,6 +67,12 @@ public class WorkerUnit : HumanoidUnit
 
         //Isim onemli. Animasyondaki ismi tetikliyoruz buradan.
         m_Animator.SetBool("IsBuilding", false);
+
+        if (m_AssignedTree != null)
+        {
+            m_AssignedTree.UnOccupy(); // Ağacı boşalt
+            m_AssignedTree = null; // Worker ile ilişkiyi kes
+        }
     }
 
     void CleanupTarget()

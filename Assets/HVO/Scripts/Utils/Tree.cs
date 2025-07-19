@@ -3,7 +3,7 @@ using UnityEngine;
 public class Tree : MonoBehaviour
 {
     [SerializeField] private CapsuleCollider2D m_Collider;
-    private bool m_Occupied = false;
+    public bool m_Occupied = false;
     public bool Occupied => m_Occupied;
 
     // 1 tane workerin agaci secmesini saglamak icin    
@@ -16,6 +16,11 @@ public class Tree : MonoBehaviour
         }
 
         return false;
+    }
+
+    public void UnOccupy()
+    {
+        m_Occupied = false;
     }
 
     // Agaca gittigimizde agacin alt kismini kesecek.
