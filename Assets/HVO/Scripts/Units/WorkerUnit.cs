@@ -49,8 +49,8 @@ public class WorkerUnit : HumanoidUnit
 
             if (distance < 1f)
             {
-                Debug.Log("Returning wood!");
                 m_WoodCollected = 0;
+                TryMoveToClosestTree();
             }
         }
 
@@ -196,6 +196,16 @@ public class WorkerUnit : HumanoidUnit
         m_Animator.SetBool("IsBuilding", true);
 
         structure.AssignWorkerToBuildProcess(this);
+    }
+
+    void TryMoveToClosestTree()
+    {
+        var closestTree = m_GameManager.FindClosestUnClaimedTree(transform.position);
+
+        if (closestTree != null)
+        {
+            SendToChop(closestTree);
+        }
     }
 
     void ResetState()
