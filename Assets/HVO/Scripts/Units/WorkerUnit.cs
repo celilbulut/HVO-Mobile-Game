@@ -6,6 +6,9 @@ public class WorkerUnit : HumanoidUnit
     [SerializeField] private float m_WoodGatherTickTime = 1f;
     [SerializeField] private float m_HitTreeFreaquency = 0.5f;
     [SerializeField] private int m_WoodPerTick = 1;
+    [SerializeField] private SpriteRenderer m_HoldingWoodSprite;
+    [SerializeField] private SpriteRenderer m_HoldingGoldSprite;
+
 
     private float m_ChoppingTimer;
     private float m_HitTreeTimer;
@@ -15,6 +18,10 @@ public class WorkerUnit : HumanoidUnit
     private int m_GoldCapacity = 10;
 
     private Tree m_AssignedTree;
+
+    public bool IsHoldingWood => m_WoodCollected > 0;
+    public bool IsHoldingGold => m_GoldCollected > 0;
+    public bool IsHoldingResource => IsHoldingWood || IsHoldingGold;
 
     protected override void UpdateBehaviour()
     {
@@ -37,6 +44,7 @@ public class WorkerUnit : HumanoidUnit
         }
 
         Debug.Log(m_WoodCollected);
+        HandleResourceDisplay();
     }
 
     protected override void OnSetDestination(DestinationSource source)
@@ -74,6 +82,28 @@ public class WorkerUnit : HumanoidUnit
         if (m_AssignedTree != null)
         {
             m_AssignedTree.Release();
+        }
+    }
+
+    void HandleResourceDisplay()
+    {
+        if (IsHoldingResource)
+        {
+            if (IsHoldingGold)
+            {
+                m_HoldingGoldSprite.gameObject.SetActive(true);
+                m_HoldingWoodSprite.gameObject.SetActive(false);
+            }
+            else
+            {
+                m_HoldingGoldSprite.gameObject.SetActive(false);
+                m_HoldingWoodSprite.gameObject.SetActive(true);
+            }
+        }
+        else
+        {
+            m_HoldingGoldSprite.gameObject.SetActive(false);
+            m_HoldingWoodSprite.gameObject.SetActive(false);
         }
     }
 
