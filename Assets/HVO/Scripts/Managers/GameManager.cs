@@ -1,21 +1,23 @@
 
 using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
 
 public enum ClickType
 {
     Move,
     Attack,
-    Build
+    Build,
+    Chop
 }
 
 public class GameManager : SingletonManager<GameManager>
 {
     [Header("UI")]
     [SerializeField] private PointToClick m_PointToMovePrefab; //Click to move yaptik
-    [SerializeField] private PointToClick m_PointToBuildPrefab;
-    [SerializeField] private PointToClick m_PointToAttackPrefab;
+    [SerializeField] private PointToClick m_PointToBuildPrefab; //Click to Building
+    [SerializeField] private PointToClick m_PointToAttackPrefab; //Click to Attack
+    [SerializeField] private PointToClick m_PointToChopPrefab; //Click to Chop
+
     [SerializeField] private ActionBar m_ActionBar;
     [SerializeField] private ConfirmationBar m_BuildConfirmationBar;
     [SerializeField] private TextPopupController m_TextPopupController;
@@ -177,6 +179,13 @@ public class GameManager : SingletonManager<GameManager>
         Vector2 worldPoint = Camera.main.ScreenToWorldPoint(inputPosition);
         RaycastHit2D hit = Physics2D.Raycast(worldPoint, Vector2.zero);
 
+        if (WorkerHasClickOnTree(hit, out Tree tree)) // Agaca tiklama
+        {
+            (ActiveUnit as WorkerUnit).SendToChop(tree);
+            DisplayClickEffect(tree.transform.position, ClickType.Chop);
+            return;
+        }
+
         if (HasClickedOnUnit(hit, out var unit))
         {
             if (unit.IsPlayer)
@@ -197,6 +206,25 @@ public class GameManager : SingletonManager<GameManager>
     public void FocusActionUI(int idx)
     {
         m_ActionBar.FocusAction(idx);
+    }
+
+    bool WorkerHasClickOnTree(RaycastHit2D hit, out Tree tree)
+    {
+        tree = null;
+
+        if (hit.collider != null)
+        {
+            var treeLayerMask = LayerMask.GetMask("Tree");
+            if (HasActiveUnit &&
+                ActiveUnit is WorkerUnit &&
+                ((1 << hit.collider.gameObject.layer & treeLayerMask) != 0))
+            {
+                tree = hit.collider.GetComponent<Tree>();
+                return true;
+            }
+        }
+
+        return false;
     }
 
     bool HasClickedOnUnit(RaycastHit2D hit, out Unit unit)
@@ -302,6 +330,10 @@ public class GameManager : SingletonManager<GameManager>
         else if (clickType == ClickType.Attack)
         {
             Instantiate(m_PointToAttackPrefab, (Vector3)worldPoint, Quaternion.identity);
+        }
+        else if (clickType == ClickType.Chop)
+        {
+            Instantiate(m_PointToChopPrefab, (Vector3)worldPoint, Quaternion.identity);
         }
     }
 
