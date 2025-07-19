@@ -18,6 +18,8 @@ public class WorkerUnit : HumanoidUnit
     private int m_GoldCapacity = 10;
 
     private Tree m_AssignedTree;
+    private StructureUnit m_AssignedWoodStorage;
+
 
     public bool IsHoldingWood => m_WoodCollected > 0;
     public bool IsHoldingGold => m_GoldCollected > 0;
@@ -32,18 +34,31 @@ public class WorkerUnit : HumanoidUnit
         }
         else if (CurrentTask == UnitTask.Chop
                 && m_AssignedTree != null
-                && m_WoodCollected < m_WoodCapacity
+                && m_WoodCollected < m_WoodCapacity                
                 )
         {
             HandleChoppingTask();
         }
-
-        if (CurrentState == UnitState.Chopping && m_WoodCollected < m_WoodCapacity)
+        else if (CurrentTask == UnitTask.ReturnResource
+                && m_AssignedWoodStorage != null
+                && IsHoldingWood
+                )
         {
-            StartChopping();
+            var closestPointOnStorage = m_AssignedWoodStorage.Collider.ClosestPoint(transform.position);
+            var distance = Vector3.Distance(closestPointOnStorage, transform.position);
+
+            if (distance < 1f)
+            {
+                Debug.Log("Returning wood!");
+                m_WoodCollected = 0;
+            }
         }
 
-        Debug.Log(m_WoodCollected);
+        if (CurrentState == UnitState.Chopping && m_WoodCollected < m_WoodCapacity)
+            {
+                StartChopping();
+            }
+
         HandleResourceDisplay();
     }
 
@@ -152,11 +167,12 @@ public class WorkerUnit : HumanoidUnit
     {
         m_Animator.SetBool("IsChopping", false);
 
-        var storage = m_GameManager.FindClosestWoodStorage(transform.position);
+        m_AssignedWoodStorage = m_GameManager.FindClosestWoodStorage(transform.position);
 
-        if (storage != null)
+        if (m_AssignedWoodStorage != null)
         {
-            MoveTo(storage.transform.position);
+            var closestPointOnStorage = m_AssignedWoodStorage.Collider.ClosestPoint(transform.position);
+            MoveTo(closestPointOnStorage);
         }
 
         SetState(UnitState.Idle);
