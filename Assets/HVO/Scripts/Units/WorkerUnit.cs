@@ -4,9 +4,11 @@ using UnityEngine;
 public class WorkerUnit : HumanoidUnit
 {
     [SerializeField] private float m_WoodGatherTickTime = 1f;
+    [SerializeField] private float m_HitTreeFreaquency = 0.5f;
     [SerializeField] private int m_WoodPerTick = 1;
 
     private float m_ChoppingTimer;
+    private float m_HitTreeTimer;
     private int m_WoodCollected;
     private int m_GoldCollected;
     private int m_WoodCapacity = 5;
@@ -93,18 +95,25 @@ public class WorkerUnit : HumanoidUnit
     {
         m_Animator.SetBool("IsChopping", true); // Isimlendirme onemli.
         m_ChoppingTimer += Time.deltaTime;
+        m_HitTreeTimer += Time.deltaTime;
+
+        if (m_HitTreeTimer >= m_HitTreeFreaquency)
+        {
+            m_HitTreeTimer = 0;
+            m_AssignedTree.HitToTree();
+        }
 
         if (m_ChoppingTimer >= m_WoodGatherTickTime)
-        {
-            m_WoodCollected += m_WoodPerTick;
-            m_ChoppingTimer = 0;
-
-            if (m_WoodCollected == m_WoodCapacity)
             {
-                m_Animator.SetBool("IsChopping", false);
-                SetState(UnitState.Idle);
+                m_WoodCollected += m_WoodPerTick;
+                m_ChoppingTimer = 0;
+
+                if (m_WoodCollected == m_WoodCapacity)
+                {
+                    m_Animator.SetBool("IsChopping", false);
+                    SetState(UnitState.Idle);
+                }
             }
-        }
     }
 
     void CheckForConstruction()
