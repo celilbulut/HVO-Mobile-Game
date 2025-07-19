@@ -3,7 +3,17 @@ using UnityEngine;
 
 public class WorkerUnit : HumanoidUnit
 {
+    [SerializeField] private float m_WoodGatherTickTime = 1f;
+    [SerializeField] private int m_WoodPerTick = 1;
+
+    private float m_ChoppingTimer;
+    private int m_WoodCollected;
+    private int m_GoldCollected;
+    private int m_WoodCapacity = 5;
+    private int m_GoldCapacity = 10;
+
     private Tree m_AssignedTree;
+
     protected override void UpdateBehaviour()
     {
         //eger gorevimiz yoksa hic birseyi check etmeyecek.
@@ -11,19 +21,25 @@ public class WorkerUnit : HumanoidUnit
         {
             CheckForConstruction();
         }
-        else if (CurrentTask == UnitTask.Chop && m_AssignedTree != null)
+        else if (CurrentTask == UnitTask.Chop
+                && m_AssignedTree != null
+                && m_WoodCollected < m_WoodCapacity
+                )
         {
             HandleChoppingTask();
         }
 
-        if (CurrentState == UnitState.Chopping)
+        if (CurrentState == UnitState.Chopping && m_WoodCollected < m_WoodCapacity)
         {
             StartChopping();
         }
+
+        Debug.Log(m_WoodCollected);
     }
 
     protected override void OnSetDestination(DestinationSource source)
     {
+        SetState(UnitState.Moving);
         ResetState();
     }
 
@@ -76,6 +92,19 @@ public class WorkerUnit : HumanoidUnit
     void StartChopping()
     {
         m_Animator.SetBool("IsChopping", true); // Isimlendirme onemli.
+        m_ChoppingTimer += Time.deltaTime;
+
+        if (m_ChoppingTimer >= m_WoodGatherTickTime)
+        {
+            m_WoodCollected += m_WoodPerTick;
+            m_ChoppingTimer = 0;
+
+            if (m_WoodCollected == m_WoodCapacity)
+            {
+                m_Animator.SetBool("IsChopping", false);
+                SetState(UnitState.Idle);
+            }
+        }
     }
 
     void CheckForConstruction()
@@ -106,6 +135,8 @@ public class WorkerUnit : HumanoidUnit
         //Isim onemli. Animasyondaki ismi tetikliyoruz buradan.
         m_Animator.SetBool("IsBuilding", false);
         m_Animator.SetBool("IsChopping", false);
+
+        m_ChoppingTimer = 0;
 
 
         if (m_AssignedTree != null)
