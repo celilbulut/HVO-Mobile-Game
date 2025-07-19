@@ -32,11 +32,21 @@ public class WorkerUnit : HumanoidUnit
 
     public void SendToChop(Tree tree)
     {
-        if (tree.TryOccupy())
+        if (tree.TryToClaim())
         {
             MoveTo(tree.GetButtomPosition());
             SetTask(UnitTask.Chop);
             m_AssignedTree = tree;
+        }
+    }
+
+    protected override void Die()
+    {
+        base.Die();
+
+        if (m_AssignedTree != null)
+        {
+            m_AssignedTree.Release();
         }
     }
 
@@ -70,7 +80,7 @@ public class WorkerUnit : HumanoidUnit
 
         if (m_AssignedTree != null)
         {
-            m_AssignedTree.UnOccupy(); // Ağacı boşalt
+            m_AssignedTree.Release(); // Ağacı boşalt
             m_AssignedTree = null; // Worker ile ilişkiyi kes
         }
     }
