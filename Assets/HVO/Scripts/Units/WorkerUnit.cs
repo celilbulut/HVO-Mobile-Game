@@ -149,9 +149,9 @@ public class WorkerUnit : HumanoidUnit
 
     void HandleMinningTask()
     {
-        var mineButtomPosition = m_AssignedTree.GetButtomPosition();
-        var workerClosestPoint = Collider.ClosestPoint(mineButtomPosition);
-        var Distance = Vector3.Distance(mineButtomPosition, workerClosestPoint);
+        var mineBottomPosition = m_AssignedGoldMine.GetBottomPosition();
+        var workerClosestPoint = Collider.ClosestPoint(mineBottomPosition);
+        var Distance = Vector3.Distance(mineBottomPosition, workerClosestPoint);
         Debug.Log(Distance);
 
         if (Distance <= 0.20f)
