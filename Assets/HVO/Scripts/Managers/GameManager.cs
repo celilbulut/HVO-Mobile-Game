@@ -32,7 +32,7 @@ public class GameManager : SingletonManager<GameManager>
 
     [Header("Resources")]
     [SerializeField] private Transform m_TreeContainer;
-
+    [SerializeField] private GoldMine m_ActiveGoldMine;
 
     public Unit ActiveUnit;
 
@@ -48,6 +48,7 @@ public class GameManager : SingletonManager<GameManager>
     private int m_Wood = 0;
     public int Gold => m_Gold;
     public int Wood => m_Wood;
+    public GoldMine ActiveGoldMine => m_ActiveGoldMine;
 
     public bool HasActiveUnit => ActiveUnit != null;
 
@@ -218,6 +219,26 @@ public class GameManager : SingletonManager<GameManager>
         foreach (StructureUnit unit in m_PlayerBuildings)
         {
             if (unit.CurrentState == UnitState.Dead || !unit.CanStoreWood) continue;
+
+            float sqrDistance = (unit.transform.position - originPoint).sqrMagnitude;
+            if (sqrDistance < closestDistanceSqr)
+            {
+                closestUnit = unit;
+                closestDistanceSqr = sqrDistance;
+            }
+        }
+
+        return closestUnit;
+    }
+
+    public StructureUnit FindClosestGoldStorage(Vector3 originPoint)
+    {
+        float closestDistanceSqr = float.MaxValue;
+        StructureUnit closestUnit = null;
+
+        foreach (StructureUnit unit in m_PlayerBuildings)
+        {
+            if (unit.CurrentState == UnitState.Dead || !unit.CanStoreGold) continue;
 
             float sqrDistance = (unit.transform.position - originPoint).sqrMagnitude;
             if (sqrDistance < closestDistanceSqr)

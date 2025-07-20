@@ -21,6 +21,7 @@ public class WorkerUnit : HumanoidUnit
     private GoldMine m_AssignedGoldMine;
 
     private StructureUnit m_AssignedWoodStorage;
+    private StructureUnit m_AssignedGoldStorage;
 
     public bool IsHoldingWood => m_WoodCollected > 0;
     public bool IsHoldingGold => m_GoldCollected > 0;
@@ -63,11 +64,28 @@ public class WorkerUnit : HumanoidUnit
                 TryMoveToClosestTree();
             }
         }
+        else if (CurrentTask == UnitTask.ReturnResource
+                && m_AssignedGoldStorage != null
+                && IsHoldingGold
+                )
+        {
+            var closestPointOnStorage = m_AssignedGoldStorage.Collider.ClosestPoint(transform.position);
+            var distance = Vector3.Distance(closestPointOnStorage, transform.position);
+
+            if (distance < 0.5f)
+            {
+                m_GameManager.ShowTextPopup(m_GoldCollected.ToString(), GetTopPosition(), Color.yellow);
+                m_GameManager.AddResources(m_GoldCollected, 0);
+                m_GoldCollected = 0;
+                MoveTo(m_GameManager.ActiveGoldMine.GetBottomPosition());
+                SetTask(UnitTask.Mine);
+            }            
+        }
 
         if (CurrentState == UnitState.Chopping && m_WoodCollected < m_WoodCapacity)
-            {
-                StartChopping();
-            }
+        {
+            StartChopping();
+        }
 
         HandleResourceDisplay();
     }
@@ -134,6 +152,14 @@ public class WorkerUnit : HumanoidUnit
         Show();
         m_GoldCollected = m_GoldCapacity;
         SetState(UnitState.Idle);
+
+        m_AssignedGoldStorage = m_GameManager.FindClosestGoldStorage(transform.position);
+
+        if (m_AssignedGoldStorage != null)
+        {
+            MoveTo(m_AssignedGoldStorage.transform.position);
+            SetTask(UnitTask.ReturnResource);
+        }
     }
 
     void HandleResourceDisplay()
