@@ -35,10 +35,17 @@ public class WorkerUnit : HumanoidUnit
         }
         else if (CurrentTask == UnitTask.Chop
                 && m_AssignedTree != null
-                && m_WoodCollected < m_WoodCapacity                
+                && m_WoodCollected < m_WoodCapacity
                 )
         {
             HandleChoppingTask();
+        }
+        else if (CurrentTask == UnitTask.Mine
+                && m_AssignedGoldMine != null
+                && !IsHoldingGold
+                )
+        {
+            HandleMinningTask();
         }
         else if (CurrentTask == UnitTask.ReturnResource
                 && m_AssignedWoodStorage != null
@@ -137,6 +144,21 @@ public class WorkerUnit : HumanoidUnit
             m_HoldingGoldSprite.gameObject.SetActive(false);
             m_HoldingWoodSprite.gameObject.SetActive(false);
             m_Animator.SetFloat("IsHoldingResource", 0f);
+        }
+    }
+
+    void HandleMinningTask()
+    {
+        var mineButtomPosition = m_AssignedTree.GetButtomPosition();
+        var workerClosestPoint = Collider.ClosestPoint(mineButtomPosition);
+        var Distance = Vector3.Distance(mineButtomPosition, workerClosestPoint);
+        Debug.Log(Distance);
+
+        if (Distance <= 0.20f)
+        {
+            StopMovement();
+            SetState(UnitState.Minning);
+            m_AssignedGoldMine.EnterMine();
         }
     }
 
