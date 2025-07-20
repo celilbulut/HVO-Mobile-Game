@@ -7,6 +7,8 @@ public class TilemapManager : SingletonManager<TilemapManager>
     [Header("Tilemaps")]
     [SerializeField] private Tilemap m_WalkableTilemap;
     [SerializeField] private Tilemap m_OverlayTileMap;
+    [SerializeField] private Tilemap m_UnbuildableTileMap;
+
     [SerializeField] private Tilemap[] m_UnreachableTilemaps;
 
     private Pathfinding m_Pathfinding;
@@ -34,12 +36,17 @@ public class TilemapManager : SingletonManager<TilemapManager>
 
     public bool CanWalkAtTile(Vector3Int tilePosition)
     {
-        return m_WalkableTilemap.HasTile(tilePosition) && !IsInUnreachableTilemap(tilePosition) && !IsBlockedByBuilding(tilePosition);
+        return m_WalkableTilemap.HasTile(tilePosition)
+               && !IsInUnreachableTilemap(tilePosition)
+               && !IsBlockedByBuilding(tilePosition);
     }
 
     public bool CanPlaceTile(Vector3Int tilePosition)
     {
-        return m_WalkableTilemap.HasTile(tilePosition) && !IsInUnreachableTilemap(tilePosition) && !IsBlockedByGameObject(tilePosition);
+        return m_WalkableTilemap.HasTile(tilePosition)
+               && !IsInUnreachableTilemap(tilePosition)
+               && !IsBlockedByGameObject(tilePosition)
+               && !m_UnbuildableTileMap.HasTile(tilePosition);
     }
 
     public bool IsInUnreachableTilemap(Vector3Int tilePosition)
