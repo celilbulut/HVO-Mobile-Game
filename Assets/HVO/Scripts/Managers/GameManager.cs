@@ -506,11 +506,17 @@ public class GameManager : SingletonManager<GameManager>
 
     void ConfirmBuildPlacement()
     {
-        if (!TryDeductResources(m_PlacementProcess.GoldCost, m_PlacementProcess.WoodCost))
+        if (((WorkerUnit)ActiveUnit).CurrentState == UnitState.Minning)
         {
-            Debug.Log("Not Enough Resources!");
+            Debug.Log("Worker is minning!");
             return;
         }
+
+        if (!TryDeductResources(m_PlacementProcess.GoldCost, m_PlacementProcess.WoodCost))
+            {
+                Debug.Log("Not Enough Resources!");
+                return;
+            }
 
         if (m_PlacementProcess.TryFinalizePlacement(out Vector3 buildPosition))
         {
