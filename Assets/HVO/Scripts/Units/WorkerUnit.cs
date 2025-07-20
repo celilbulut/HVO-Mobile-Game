@@ -124,6 +124,18 @@ public class WorkerUnit : HumanoidUnit
         }
     }
 
+    public void OnEnterMine()
+    {
+        Hide();
+    }
+
+    public void OnLeaveMine()
+    {
+        Show();
+        m_GoldCollected = m_GoldCapacity;
+        SetState(UnitState.Idle);
+    }
+
     void HandleResourceDisplay()
     {
         if (IsHoldingResource)
@@ -160,7 +172,6 @@ public class WorkerUnit : HumanoidUnit
             if (m_AssignedGoldMine.TryToEnterMine(this))
             {
                 m_WoodCollected = 0;
-                m_GameManager.CancelActiveUnit();
                 StopMovement();
                 SetState(UnitState.Minning);
             }
@@ -176,6 +187,7 @@ public class WorkerUnit : HumanoidUnit
 
         if (Distance <= 0.1f)
         {
+            m_GoldCollected = 0;
             StopMovement();
             SetState(UnitState.Chopping);
         }
