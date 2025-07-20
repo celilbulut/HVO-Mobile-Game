@@ -298,6 +298,14 @@ public class GameManager : SingletonManager<GameManager>
     {
         m_ActionBar.FocusAction(idx);
     }
+    
+    public void CancelActiveUnit()
+    {
+        ActiveUnit.DeSelect();
+        ActiveUnit = null;
+
+        ClearActionBarUI();
+    }
 
     bool TryGetClickedResource<T>(RaycastHit2D hit, out T resource) where T: MonoBehaviour
     {
@@ -321,6 +329,8 @@ public class GameManager : SingletonManager<GameManager>
     {
         if (HasActiveUnit && IsHumanoid(ActiveUnit))
         {
+            if (ActiveUnit.CurrentState == UnitState.Minning) return;
+
             DisplayClickEffect(worldPoint, ClickType.Move);
             ActiveUnit.MoveTo(worldPoint, DestinationSource.PlayerClick);
         }
@@ -402,14 +412,6 @@ public class GameManager : SingletonManager<GameManager>
     bool IsHumanoid(Unit unit)
     {
         return unit is HumanoidUnit;
-    }
-
-    void CancelActiveUnit()
-    {
-        ActiveUnit.DeSelect();
-        ActiveUnit = null;
-
-        ClearActionBarUI();
     }
 
     void DisplayClickEffect(Vector2 worldPoint, ClickType clickType)
