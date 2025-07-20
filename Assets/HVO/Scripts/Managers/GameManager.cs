@@ -32,7 +32,7 @@ public class GameManager : SingletonManager<GameManager>
 
     [Header("Resources")]
     [SerializeField] private Transform m_TreeContainer;
-
+    [SerializeField] private GoldMine m_ActiveGoldMine;
 
     public Unit ActiveUnit;
 
@@ -48,6 +48,7 @@ public class GameManager : SingletonManager<GameManager>
     private int m_Wood = 0;
     public int Gold => m_Gold;
     public int Wood => m_Wood;
+    public GoldMine ActiveGoldMine => m_ActiveGoldMine;
 
     public bool HasActiveUnit => ActiveUnit != null;
 
@@ -230,6 +231,26 @@ public class GameManager : SingletonManager<GameManager>
         return closestUnit;
     }
 
+    public StructureUnit FindClosestGoldStorage(Vector3 originPoint)
+    {
+        float closestDistanceSqr = float.MaxValue;
+        StructureUnit closestUnit = null;
+
+        foreach (StructureUnit unit in m_PlayerBuildings)
+        {
+            if (unit.CurrentState == UnitState.Dead || !unit.CanStoreGold) continue;
+
+            float sqrDistance = (unit.transform.position - originPoint).sqrMagnitude;
+            if (sqrDistance < closestDistanceSqr)
+            {
+                closestUnit = unit;
+                closestDistanceSqr = sqrDistance;
+            }
+        }
+
+        return closestUnit;
+    }
+
     public List<Unit> GetFriendlyUnits(bool isPlayer)
     {
         return isPlayer ? m_PlayerUnits : m_Enemies;
@@ -261,11 +282,20 @@ public class GameManager : SingletonManager<GameManager>
         Vector2 worldPoint = Camera.main.ScreenToWorldPoint(inputPosition);
         RaycastHit2D hit = Physics2D.Raycast(worldPoint, Vector2.zero);
 
-        if (WorkerHasClickOnTree(hit, out Tree tree)) // Agaca tiklama
+        if (HasActiveUnit && ActiveUnit is WorkerUnit worker)
         {
-            (ActiveUnit as WorkerUnit).SendToChop(tree);
-            DisplayClickEffect(tree.transform.position, ClickType.Chop);
-            return;
+            if (TryGetClickedResource(hit, out Tree tree)) // Agaca tiklama
+            {
+                (worker as WorkerUnit).SendToChop(tree);
+                DisplayClickEffect(tree.transform.position, ClickType.Chop);
+                return;
+            }
+            else if (TryGetClickedResource(hit, out GoldMine mine))
+            {
+                worker.SendToMine(mine);
+                DisplayClickEffect(mine.transform.position, ClickType.Build);
+                return;
+            }
         }
 
         if (HasClickedOnUnit(hit, out var unit))
@@ -289,24 +319,20 @@ public class GameManager : SingletonManager<GameManager>
     {
         m_ActionBar.FocusAction(idx);
     }
-
-    bool WorkerHasClickOnTree(RaycastHit2D hit, out Tree tree)
+    
+    public void CancelActiveUnit()
     {
-        tree = null;
+        ActiveUnit.DeSelect();
+        ActiveUnit = null;
 
-        if (hit.collider != null)
-        {
-            var treeLayerMask = LayerMask.GetMask("Tree");
-            if (HasActiveUnit &&
-                ActiveUnit is WorkerUnit &&
-                ((1 << hit.collider.gameObject.layer & treeLayerMask) != 0))
-            {
-                tree = hit.collider.GetComponent<Tree>();
-                return true;
-            }
-        }
+        ClearActionBarUI();
+    }
 
-        return false;
+    bool TryGetClickedResource<T>(RaycastHit2D hit, out T resource) where T: MonoBehaviour
+    {
+        resource = null;
+        if (hit.collider == null) return false;
+        return hit.collider.TryGetComponent(out resource);
     }
 
     bool HasClickedOnUnit(RaycastHit2D hit, out Unit unit)
@@ -324,6 +350,8 @@ public class GameManager : SingletonManager<GameManager>
     {
         if (HasActiveUnit && IsHumanoid(ActiveUnit))
         {
+            if (ActiveUnit.CurrentState == UnitState.Minning) return;
+
             DisplayClickEffect(worldPoint, ClickType.Move);
             ActiveUnit.MoveTo(worldPoint, DestinationSource.PlayerClick);
         }
@@ -348,11 +376,12 @@ public class GameManager : SingletonManager<GameManager>
                 }
                 else if (worker.IsHoldingWood && WorkerClickOnWoodStorage(unit))
                 {
-                    var closestPoint = unit.Collider.ClosestPoint(worker.transform.position);
-                    worker.MoveTo(closestPoint, DestinationSource.PlayerClick);
-                    worker.SetTask(UnitTask.ReturnResource);
-                    worker.SetWoodStorage(unit as StructureUnit);
-                    DisplayClickEffect(unit.transform.position, ClickType.Build);
+                    HandleResourceReturn(worker, unit as StructureUnit);
+                    return;
+                }
+                else if (worker.IsHoldingGold && WorkerClickOnGoldStorage(unit))
+                {
+                    HandleResourceReturn(worker, unit as StructureUnit);
                     return;
                 }
             }
@@ -361,9 +390,31 @@ public class GameManager : SingletonManager<GameManager>
         SelectNewUnit(unit);
     }
 
+    void HandleResourceReturn(WorkerUnit worker, StructureUnit structure)
+    {
+        var closestPoint = structure.Collider.ClosestPoint(worker.transform.position);
+        worker.MoveTo(closestPoint, DestinationSource.PlayerClick);
+        worker.SetTask(UnitTask.ReturnResource);
+
+        if (worker.IsHoldingGold && structure.CanStoreGold)
+        {
+            worker.SetGoldStorage(structure);
+        }
+        else if (worker.IsHoldingWood && structure.CanStoreWood)
+        {
+            worker.SetWoodStorage(structure);
+        }
+
+        DisplayClickEffect(structure.transform.position, ClickType.Build);
+    }
+
     bool WorkerClickOnWoodStorage(Unit clickedUnit)
     {
         return (clickedUnit is StructureUnit structure) && structure.CanStoreWood;        
+    }
+    bool WorkerClickOnGoldStorage(Unit clickedUnit)
+    {
+        return (clickedUnit is StructureUnit structure) && structure.CanStoreGold;        
     }
 
     void HandleClickOnEnemy(Unit enemyUnit)
@@ -405,14 +456,6 @@ public class GameManager : SingletonManager<GameManager>
     bool IsHumanoid(Unit unit)
     {
         return unit is HumanoidUnit;
-    }
-
-    void CancelActiveUnit()
-    {
-        ActiveUnit.DeSelect();
-        ActiveUnit = null;
-
-        ClearActionBarUI();
     }
 
     void DisplayClickEffect(Vector2 worldPoint, ClickType clickType)
@@ -463,11 +506,17 @@ public class GameManager : SingletonManager<GameManager>
 
     void ConfirmBuildPlacement()
     {
-        if (!TryDeductResources(m_PlacementProcess.GoldCost, m_PlacementProcess.WoodCost))
+        if (((WorkerUnit)ActiveUnit).CurrentState == UnitState.Minning)
         {
-            Debug.Log("Not Enough Resources!");
+            Debug.Log("Worker is minning!");
             return;
         }
+
+        if (!TryDeductResources(m_PlacementProcess.GoldCost, m_PlacementProcess.WoodCost))
+            {
+                Debug.Log("Not Enough Resources!");
+                return;
+            }
 
         if (m_PlacementProcess.TryFinalizePlacement(out Vector3 buildPosition))
         {

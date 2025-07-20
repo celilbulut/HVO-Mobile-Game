@@ -1,6 +1,7 @@
 using System.Collections;
 using Unity.VisualScripting;
 using UnityEngine;
+using UnityEngine.Assertions.Must;
 
 public enum UnitState
 {
@@ -136,6 +137,20 @@ public abstract class Unit : MonoBehaviour
                 return;
             }
         }
+    }
+
+    // Calisanlar mine a girince kaybolacak.
+    public void Hide()
+    {
+        m_SpriteRenderer.enabled = false;
+        m_Collider.enabled = false;
+    }
+
+    // Calisanlar mine dan cikinca tekrar gozukecek.
+    public void Show()
+    {
+        m_SpriteRenderer.enabled = true;
+        m_Collider.enabled = true;
     }
 
     public void MoveTo(Vector3 destination, DestinationSource source = DestinationSource.CodeTriggered)
