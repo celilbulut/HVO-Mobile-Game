@@ -261,11 +261,20 @@ public class GameManager : SingletonManager<GameManager>
         Vector2 worldPoint = Camera.main.ScreenToWorldPoint(inputPosition);
         RaycastHit2D hit = Physics2D.Raycast(worldPoint, Vector2.zero);
 
-        if (WorkerHasClickOnTree(hit, out Tree tree)) // Agaca tiklama
+        if (HasActiveUnit && ActiveUnit is WorkerUnit worker)
         {
-            (ActiveUnit as WorkerUnit).SendToChop(tree);
-            DisplayClickEffect(tree.transform.position, ClickType.Chop);
-            return;
+            if (WorkerHasClickOnTree(hit, out Tree tree)) // Agaca tiklama
+            {
+                (worker as WorkerUnit).SendToChop(tree);
+                DisplayClickEffect(tree.transform.position, ClickType.Chop);
+                return;
+            }
+            else if (WorkerHasClickOnGoldMine(hit, out GoldMine mine))
+            {
+                worker.SendToMine(mine);
+                DisplayClickEffect(mine.transform.position, ClickType.Build);
+                return;
+            }
         }
 
         if (HasClickedOnUnit(hit, out var unit))
@@ -297,11 +306,28 @@ public class GameManager : SingletonManager<GameManager>
         if (hit.collider != null)
         {
             var treeLayerMask = LayerMask.GetMask("Tree");
-            if (HasActiveUnit &&
-                ActiveUnit is WorkerUnit &&
-                ((1 << hit.collider.gameObject.layer & treeLayerMask) != 0))
+
+            if ((1 << hit.collider.gameObject.layer & treeLayerMask) != 0)
             {
                 tree = hit.collider.GetComponent<Tree>();
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    bool WorkerHasClickOnGoldMine(RaycastHit2D hit, out GoldMine goldMine)
+    {
+        goldMine = null;
+
+        if (hit.collider != null)
+        {
+            var goldMineLayerMask = LayerMask.GetMask("GoldMine");
+
+            if ((1 << hit.collider.gameObject.layer & goldMineLayerMask) != 0)
+            {
+                goldMine = hit.collider.GetComponent<GoldMine>();
                 return true;
             }
         }
