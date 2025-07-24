@@ -304,8 +304,12 @@ public class GameManager : SingletonManager<GameManager>
             Vector2 spawnOffset = new Vector2(Mathf.Cos(angle * Mathf.Deg2Rad), Mathf.Sin(angle * Mathf.Deg2Rad)) * spawnRadius;
             Vector2 spawnPosition = (Vector2)ActiveUnit.transform.position + spawnOffset;
 
+            var spawnPositionOnCollider = castleCollider.ClosestPoint(spawnPosition);
+            var opositeDirection = (spawnPositionOnCollider - (Vector2)castleCollider.transform.position).normalized;
+            spawnPositionOnCollider += opositeDirection * 0.4f;
+
             var unitLayerMask = LayerMask.GetMask("Unit");
-            var hits = Physics2D.OverlapCircleAll(spawnPosition, 0.5f, unitLayerMask);
+            var hits = Physics2D.OverlapCircleAll(spawnPositionOnCollider, 0.5f, unitLayerMask);
             bool isPositionOccupied = false;
 
             foreach (var hit in hits)
@@ -318,11 +322,15 @@ public class GameManager : SingletonManager<GameManager>
             }
 
             if (!isPositionOccupied)
-                {
-                    Instantiate(trainUnitAction.UnitPrefab, spawnPosition, Quaternion.identity);
-                    return;
-                }
+            {
+                Instantiate(trainUnitAction.UnitPrefab, spawnPositionOnCollider, Quaternion.identity);
+                m_BuildConfirmationBar.UpdateRequirementsUI(trainUnitAction.GoldCost, trainUnitAction.WoodCost);
+                return;
+            }
         }
+
+        // Unitler uretilmezse kaynaklar refund yapiliyor.
+        AddResources(trainUnitAction.GoldCost, trainUnitAction.WoodCost);
     }
 
     void CancelUnitTrainingConfirmation()
