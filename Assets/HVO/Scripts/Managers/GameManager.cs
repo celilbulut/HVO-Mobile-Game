@@ -274,7 +274,29 @@ public class GameManager : SingletonManager<GameManager>
 
     public void StartUnitTrainProcess(TrainUnitActionSO trainUnitActionSO)
     {
-        Debug.Log("Start Training!");
+        m_BuildConfirmationBar.Show(
+            trainUnitActionSO.GoldCost,
+            trainUnitActionSO.WoodCost
+            );
+
+        m_BuildConfirmationBar.SetupHooks(
+            () => FinalizeUnitTraining(trainUnitActionSO),
+            CancelUnitTrainingConfirmation
+            );
+    }
+
+    void FinalizeUnitTraining(TrainUnitActionSO trainUnitAction)
+    {
+        if (!TryDeductResources(trainUnitAction.GoldCost, trainUnitAction.WoodCost))
+        {
+            Debug.Log("Not enough resources!");
+            return;
+        }
+    }
+
+    void CancelUnitTrainingConfirmation()
+    {
+        m_BuildConfirmationBar.Hide();
     }
 
     void DetectClick(Vector2 inputPosition)
