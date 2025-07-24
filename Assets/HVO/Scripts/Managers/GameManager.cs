@@ -272,6 +272,72 @@ public class GameManager : SingletonManager<GameManager>
         m_CameraController.LockCamera = true;
     }
 
+    public void StartUnitTrainProcess(TrainUnitActionSO trainUnitActionSO)
+    {
+        m_BuildConfirmationBar.Show(
+            trainUnitActionSO.GoldCost,
+            trainUnitActionSO.WoodCost
+            );
+
+        m_BuildConfirmationBar.SetupHooks(
+            () => FinalizeUnitTraining(trainUnitActionSO),
+            CancelUnitTrainingConfirmation
+            );
+    }
+
+    void FinalizeUnitTraining(TrainUnitActionSO trainUnitAction)
+    {
+        if (!TryDeductResources(trainUnitAction.GoldCost, trainUnitAction.WoodCost))
+        {
+            Debug.Log("Not enough resources!");
+            return;
+        }
+
+        Collider2D castleCollider = ActiveUnit.Collider;
+
+        float spawnRadius = castleCollider.bounds.extents.x;
+        int maxSpawnAttemps = 20;
+
+        for (int i = 0; i < maxSpawnAttemps; i++)
+        {
+            float angle = (360f / maxSpawnAttemps) * i;
+            Vector2 spawnOffset = new Vector2(Mathf.Cos(angle * Mathf.Deg2Rad), Mathf.Sin(angle * Mathf.Deg2Rad)) * spawnRadius;
+            Vector2 spawnPosition = (Vector2)ActiveUnit.transform.position + spawnOffset;
+
+            var spawnPositionOnCollider = castleCollider.ClosestPoint(spawnPosition);
+            var opositeDirection = (spawnPositionOnCollider - (Vector2)castleCollider.transform.position).normalized;
+            spawnPositionOnCollider += opositeDirection * 0.4f;
+
+            var unitLayerMask = LayerMask.GetMask("Unit");
+            var hits = Physics2D.OverlapCircleAll(spawnPositionOnCollider, 0.5f, unitLayerMask);
+            bool isPositionOccupied = false;
+
+            foreach (var hit in hits)
+            {
+                if (hit != castleCollider)
+                {
+                    isPositionOccupied = true;
+                    break;
+                }
+            }
+
+            if (!isPositionOccupied)
+            {
+                Instantiate(trainUnitAction.UnitPrefab, spawnPositionOnCollider, Quaternion.identity);
+                m_BuildConfirmationBar.UpdateRequirementsUI(trainUnitAction.GoldCost, trainUnitAction.WoodCost);
+                return;
+            }
+        }
+
+        // Unitler uretilmezse kaynaklar refund yapiliyor.
+        AddResources(trainUnitAction.GoldCost, trainUnitAction.WoodCost);
+    }
+
+    void CancelUnitTrainingConfirmation()
+    {
+        m_BuildConfirmationBar.Hide();
+    }
+
     void DetectClick(Vector2 inputPosition)
     {
         if (HvoUtils.IsPointerOverUIElement())
@@ -500,6 +566,11 @@ public class GameManager : SingletonManager<GameManager>
 
     void ClearActionBarUI()
     {
+        if (m_BuildConfirmationBar.enabled)
+        {
+            m_BuildConfirmationBar.Hide();
+        }
+
         m_ActionBar.ClearActions();
         m_ActionBar.Hide();
     }
