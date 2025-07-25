@@ -6,6 +6,7 @@ public class EnemyUnit : HumanoidUnit
     private float m_CurrentAttackCommitmentTime = 0f;
 
     public override bool IsPlayer => false;
+    public Unit KingUnit => m_GameManager.KingUnit;
 
     protected override void UpdateBehaviour()
     {
@@ -35,6 +36,17 @@ public class EnemyUnit : HumanoidUnit
                         SetTarget(foe);
                         MoveTo(foe.transform.position);
                     }
+                    else if (KingUnit != null && KingUnit.CurrentState != UnitState.Dead)                    
+                    {
+                        var distance = Vector3.Distance(transform.position, KingUnit.transform.position);
+
+                        if (distance < m_ObjectDetectionRadius)
+                        {
+                            SetTarget(KingUnit);
+                        }
+
+                        MoveTo(KingUnit.transform.position);
+                    }
                 }
                 break;
 
@@ -63,6 +75,6 @@ public class EnemyUnit : HumanoidUnit
                     SetState(UnitState.Idle);
                 }
                 break;
-        }        
+        }
     }
 }
