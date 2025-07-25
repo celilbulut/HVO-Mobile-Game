@@ -34,8 +34,12 @@ public class GameManager : SingletonManager<GameManager>
     [SerializeField] private Transform m_TreeContainer;
     [SerializeField] private GoldMine m_ActiveGoldMine;
 
+    [Header("Spawning")]
+    [SerializeField] private EnemySpawner m_EnemySpawner;
+
     public Unit ActiveUnit;
 
+    private Unit m_KingUnit;
     private Tree[] m_Trees = new Tree[0];
     private List<Unit> m_PlayerUnits = new();
     private List<StructureUnit> m_PlayerBuildings = new();
@@ -49,14 +53,16 @@ public class GameManager : SingletonManager<GameManager>
     public int Gold => m_Gold;
     public int Wood => m_Wood;
     public GoldMine ActiveGoldMine => m_ActiveGoldMine;
-
     public bool HasActiveUnit => ActiveUnit != null;
+    public Unit KingUnit => m_KingUnit;
 
     void Start()
     {
         m_CameraController = new CameraController(m_PanSpeed, m_MobilePanSpeed);
         ClearActionBarUI();
         AddResources(500, 500);
+
+        m_EnemySpawner.StartUp();
     }
 
     void Update()
@@ -81,6 +87,10 @@ public class GameManager : SingletonManager<GameManager>
             if (unit.IsBuilding)
             {
                 m_PlayerBuildings.Add(unit as StructureUnit);
+            }
+            else if (unit.IsKingUnit)
+            {
+                m_KingUnit = unit;
             }
             else
             {
@@ -114,6 +124,10 @@ public class GameManager : SingletonManager<GameManager>
             if (unit.IsBuilding)
             {
                 m_PlayerBuildings.Remove(unit as StructureUnit);
+            }
+            else if (unit.IsKingUnit)
+            {
+                m_KingUnit = null;
             }
             else
             {
