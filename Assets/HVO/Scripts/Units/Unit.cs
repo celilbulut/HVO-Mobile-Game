@@ -40,6 +40,9 @@ public abstract class Unit : MonoBehaviour
     [SerializeField] protected int m_Health = 100;
     [SerializeField] protected Color m_DamageFlashColor = new Color(1f, 0.63f, 0.63f, 1f);
 
+    [Header("Audio")]
+    [SerializeField] protected AudioSettings m_InteractionAudioSettings;
+
     public bool IsTarget;
 
     protected GameManager m_GameManager;
