@@ -34,6 +34,9 @@ public class GameManager : SingletonManager<GameManager>
     [SerializeField] private Transform m_TreeContainer;
     [SerializeField] private GoldMine m_ActiveGoldMine;
 
+    [Header("Spawning")]
+    [SerializeField] private EnemySpawner m_EnemySpawner;
+
     public Unit ActiveUnit;
 
     private Unit m_KingUnit;
@@ -58,6 +61,8 @@ public class GameManager : SingletonManager<GameManager>
         m_CameraController = new CameraController(m_PanSpeed, m_MobilePanSpeed);
         ClearActionBarUI();
         AddResources(500, 500);
+
+        m_EnemySpawner.StartUp();
     }
 
     void Update()
