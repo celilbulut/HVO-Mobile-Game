@@ -213,7 +213,6 @@ MonoBehaviour:
   m_AttackAudioSettings:
     Clips:
     - {fileID: 8300000, guid: 9ca81c94197f46e44b48baffdfba7a33, type: 3}
-    - {fileID: 8300000, guid: 8e3c08365f663144f9734d646ef945ae, type: 3}
     Volume: 0.6
     Pitch: 1
     Loop: 0
