@@ -202,23 +202,25 @@ MonoBehaviour:
     - {fileID: 8300000, guid: 3ea1bbd04ab87644f985aa0d6ae8c9ab, type: 3}
     - {fileID: 8300000, guid: 9419213d4a8961e49a676c50b575e364, type: 3}
     - {fileID: 8300000, guid: 9ceecbf73d940554ebc9623af006c1fa, type: 3}
-    Volume: 1
+    Volume: 0.6
     Pitch: 1
     Loop: 0
-    SpatialBlend: 1
+    SpatialBlend: 0
     MinDistance: 5
     MaxDistance: 50
     Priority: 128
+    RolloffMode: 1
   m_AttackAudioSettings:
     Clips:
     - {fileID: 8300000, guid: 3242bbaddf217714a9fedf3e01adc72a, type: 3}
     - {fileID: 8300000, guid: 7ba8028442f3e2644beac2df4d019e30, type: 3}
     - {fileID: 8300000, guid: 560587f537561e84983cd83820093df2, type: 3}
-    Volume: 1
+    Volume: 0.6
     Pitch: 1
     Loop: 0
     SpatialBlend: 1
     MinDistance: 1
     MaxDistance: 15
     Priority: 128
+    RolloffMode: 1
   IsTarget: 0

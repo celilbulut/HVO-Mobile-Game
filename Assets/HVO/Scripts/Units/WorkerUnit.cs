@@ -77,6 +77,8 @@ public class WorkerUnit : HumanoidUnit
 
     protected override void OnSetDestination(DestinationSource source)
     {
+        base.OnSetDestination(source);
+        
         if (CurrentState == UnitState.Minning) return;
 
         SetState(UnitState.Moving);

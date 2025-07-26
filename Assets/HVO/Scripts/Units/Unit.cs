@@ -168,6 +168,8 @@ public abstract class Unit : MonoBehaviour
 
     public void Select()
     {
+        OnPlayInteractionSound();
+
         Highlight();
         IsTarget = true;
 
@@ -201,12 +203,20 @@ public abstract class Unit : MonoBehaviour
 
     protected virtual void OnSetDestination(DestinationSource source)
     {
-
+        if (source == DestinationSource.PlayerClick)
+        {
+            OnPlayInteractionSound();
+        }
     }
 
     protected virtual void OnPlayAttackSound()
     {
         AudioManager.Get().PlaySound(m_AttackAudioSettings, transform.position);
+    }
+
+    protected virtual void OnPlayInteractionSound()
+    {
+        AudioManager.Get().PlaySound(m_InteractionAudioSettings, transform.position);
     }
 
     protected virtual void OnSetTask(UnitTask oldTask, UnitTask newTask)
