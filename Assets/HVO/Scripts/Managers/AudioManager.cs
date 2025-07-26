@@ -1,3 +1,4 @@
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -45,6 +46,28 @@ public class AudioManager : SingletonManager<AudioManager>
         ConfigureAudioSource(source, audioSettings);
         source.transform.position = position;
         source.Play();
+
+        Debug.Log("Pool Sources: " + m_AudioSourcePool.Count);
+        Debug.Log("Active Sources: " + m_ActiveSources.Count);
+
+        if (!source.loop)
+        {
+            StartCoroutine(ReturnToPoolWhenDone(source));
+        }
+    }
+
+    IEnumerator ReturnToPoolWhenDone(AudioSource source)
+    {
+        yield return new WaitWhile(() => source.isPlaying);
+
+        StopAndReturnToPool(source);
+    }
+
+    void StopAndReturnToPool(AudioSource source)
+    {
+        source.Stop();
+        m_ActiveSources.Remove(source);
+        m_AudioSourcePool.Enqueue(source);
     }
 
     void ConfigureAudioSource(AudioSource source, AudioSettings settings)
@@ -62,7 +85,7 @@ public class AudioManager : SingletonManager<AudioManager>
 
     AudioSource GetAvailableAudioSource()
     {
-        if (m_AudioSourcePool.Count > 0)
+        if (m_AudioSourcePool.Count <= 0)
         {
             for (int i = 0; i < m_InitialPoolSize; i++)
             {
