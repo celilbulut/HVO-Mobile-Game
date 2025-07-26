@@ -205,11 +205,10 @@ MonoBehaviour:
     Volume: 1
     Pitch: 1
     Loop: 0
-    SpacialBlend: 1
+    SpatialBlend: 1
     MinDistance: 5
     MaxDistance: 50
     Priority: 128
-  IsTarget: 0
   m_AttackAudioSettings:
     Clips:
     - {fileID: 8300000, guid: 3242bbaddf217714a9fedf3e01adc72a, type: 3}
@@ -218,7 +217,8 @@ MonoBehaviour:
     Volume: 1
     Pitch: 1
     Loop: 0
-    SpacialBlend: 1
-    MinDistance: 5
-    MaxDistance: 50
+    SpatialBlend: 1
+    MinDistance: 1
+    MaxDistance: 15
     Priority: 128
+  IsTarget: 0

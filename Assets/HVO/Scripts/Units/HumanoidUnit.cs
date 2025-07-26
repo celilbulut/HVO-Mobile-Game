@@ -3,9 +3,6 @@ using UnityEngine;
 
 public class HumanoidUnit : Unit
 {
-    [Header("Audio")]
-    [SerializeField] protected AudioSettings m_AttackAudioSettings;
-    
     protected Vector2 m_Velocity;
     protected Vector3 m_LastPosition;
     protected float m_SmoothFactor = 50;

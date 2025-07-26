@@ -42,6 +42,7 @@ public abstract class Unit : MonoBehaviour
 
     [Header("Audio")]
     [SerializeField] protected AudioSettings m_InteractionAudioSettings;
+    [SerializeField] protected AudioSettings m_AttackAudioSettings;
 
     public bool IsTarget;
 
@@ -203,6 +204,11 @@ public abstract class Unit : MonoBehaviour
 
     }
 
+    protected virtual void OnPlayAttackSound()
+    {
+        AudioManager.Get().PlaySound(m_AttackAudioSettings, transform.position);
+    }
+
     protected virtual void OnSetTask(UnitTask oldTask, UnitTask newTask)
     {
         CurrentTask = newTask;
@@ -253,6 +259,7 @@ public abstract class Unit : MonoBehaviour
 
     protected virtual void OnAttackReady(Unit target)
     {
+        OnPlayAttackSound();
         PerformAttackAnimation();
         StartCoroutine(DelayDamage(m_AutoAttackDamageDelay, m_AutoAttackDamage, Target));
     }
