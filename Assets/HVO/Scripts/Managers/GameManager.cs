@@ -39,6 +39,7 @@ public class GameManager : SingletonManager<GameManager>
 
     [Header("Audio")]
     [SerializeField] private AudioSettings m_PlacementAudioSettings; // Building
+    [SerializeField] private AudioSettings m_BackgroundMusicAudioSettings;
 
     public Unit ActiveUnit;
 
@@ -66,6 +67,7 @@ public class GameManager : SingletonManager<GameManager>
         AddResources(500, 500);
 
         m_EnemySpawner.StartUp();
+        AudioManager.Get().PlayMusic(m_BackgroundMusicAudioSettings);
     }
 
     void Update()
