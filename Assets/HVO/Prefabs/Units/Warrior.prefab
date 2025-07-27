@@ -223,4 +223,15 @@ MonoBehaviour:
     MaxDistance: 15
     Priority: 128
     RolloffMode: 1
+  m_TerminationAudioSettings:
+    Clips:
+    - {fileID: 8300000, guid: abc5c29a60400dd40bf3472267738a63, type: 3}
+    Volume: 0.6
+    Pitch: 1
+    Loop: 0
+    SpatialBlend: 1
+    MinDistance: 1
+    MaxDistance: 15
+    Priority: 128
+    RolloffMode: 1
   IsTarget: 0
