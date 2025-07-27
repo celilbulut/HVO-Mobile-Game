@@ -68,13 +68,11 @@ public class BuildingProcess
     public void AddWorker(WorkerUnit worker)
     {
         if(HasActiveWorker) return;
-        //Debug.Log("Adding Worker");
         m_Worker = worker;
     }
     public void RemoveWorker()
     {
         if (!HasActiveWorker) return;
-        //Debug.Log("Removing Worker");
         m_Worker = null;
         m_ConstructionEffect.Stop();
     }
