@@ -235,3 +235,17 @@ MonoBehaviour:
     Priority: 128
     RolloffMode: 1
   IsTarget: 0
+  m_FootstepAudioSettings:
+    Clips:
+    - {fileID: 8300000, guid: 07d15118521ed764b9d0807bf28b16d2, type: 3}
+    - {fileID: 8300000, guid: 64429bb6f6755814f938d1c1751e8fbb, type: 3}
+    - {fileID: 8300000, guid: 32f71b6935af40c4aaabb85ed4ccfc16, type: 3}
+    Volume: 1
+    Pitch: 1
+    Loop: 0
+    SpatialBlend: 1
+    MinDistance: 1
+    MaxDistance: 15
+    Priority: 128
+    RolloffMode: 1
+  m_FootstepFrequency: 0.3
