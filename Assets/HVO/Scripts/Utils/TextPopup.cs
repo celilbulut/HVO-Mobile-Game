@@ -28,7 +28,7 @@ public class TextPopup : MonoBehaviour
 
     void Update()
     {
-        m_ElapsedTime += Time.deltaTime;
+        m_ElapsedTime += Time.unscaledDeltaTime;
         var normalizedTime = m_ElapsedTime / m_Duration;
 
         if (normalizedTime >= 1)

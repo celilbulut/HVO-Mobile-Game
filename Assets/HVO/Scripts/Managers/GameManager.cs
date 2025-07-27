@@ -10,6 +10,12 @@ public enum ClickType
     Chop
 }
 
+public enum GameState
+{
+    Playing,
+    Paused
+}
+
 public class GameManager : SingletonManager<GameManager>
 {
     [Header("UI")]
@@ -40,9 +46,12 @@ public class GameManager : SingletonManager<GameManager>
     [Header("Audio")]
     [SerializeField] private AudioSettings m_PlacementAudioSettings; // Building
     [SerializeField] private AudioSettings m_BackgroundMusicAudioSettings;
+    [SerializeField] private AudioSettings m_WinAudioSettings;
+    [SerializeField] private AudioSettings m_LoseAudioSettings;
 
     public Unit ActiveUnit;
 
+    private GameState m_GameState = GameState.Playing;
     private Unit m_KingUnit;
     private Tree[] m_Trees = new Tree[0];
     private List<Unit> m_PlayerUnits = new();
@@ -72,6 +81,14 @@ public class GameManager : SingletonManager<GameManager>
 
     void Update()
     {
+        if (m_GameState == GameState.Paused) return;
+
+        if (m_EnemySpawner.SpawnState == SpawnState.Finished && m_Enemies.Count == 0)
+        {
+            HandleGameOver(true);
+            return;
+        }
+
         m_CameraController.Update();
 
         if (m_PlacementProcess != null)
@@ -86,7 +103,7 @@ public class GameManager : SingletonManager<GameManager>
     }
 
     public void RegisterUnit(Unit unit)
-    {        
+    {
         if (unit.IsPlayer)
         {
             if (unit.IsBuilding)
@@ -404,7 +421,7 @@ public class GameManager : SingletonManager<GameManager>
     {
         m_ActionBar.FocusAction(idx);
     }
-    
+
     public void CancelActiveUnit()
     {
         ActiveUnit.DeSelect();
@@ -413,7 +430,7 @@ public class GameManager : SingletonManager<GameManager>
         ClearActionBarUI();
     }
 
-    bool TryGetClickedResource<T>(RaycastHit2D hit, out T resource) where T: MonoBehaviour
+    bool TryGetClickedResource<T>(RaycastHit2D hit, out T resource) where T : MonoBehaviour
     {
         resource = null;
         if (hit.collider == null) return false;
@@ -495,11 +512,11 @@ public class GameManager : SingletonManager<GameManager>
 
     bool WorkerClickOnWoodStorage(Unit clickedUnit)
     {
-        return (clickedUnit is StructureUnit structure) && structure.CanStoreWood;        
+        return (clickedUnit is StructureUnit structure) && structure.CanStoreWood;
     }
     bool WorkerClickOnGoldStorage(Unit clickedUnit)
     {
-        return (clickedUnit is StructureUnit structure) && structure.CanStoreGold;        
+        return (clickedUnit is StructureUnit structure) && structure.CanStoreGold;
     }
 
     void HandleClickOnEnemy(Unit enemyUnit)
@@ -603,10 +620,10 @@ public class GameManager : SingletonManager<GameManager>
         }
 
         if (!TryDeductResources(m_PlacementProcess.GoldCost, m_PlacementProcess.WoodCost))
-            {
-                Debug.Log("Not Enough Resources!");
-                return;
-            }
+        {
+            Debug.Log("Not Enough Resources!");
+            return;
+        }
 
         if (m_PlacementProcess.TryFinalizePlacement(out Vector3 buildPosition))
         {
@@ -646,6 +663,21 @@ public class GameManager : SingletonManager<GameManager>
         }
 
         return false;
+    }
+
+    void HandleGameOver(bool isVictory)
+    {
+        if (isVictory)
+        {
+            AudioManager.Get().PlayMusic(m_WinAudioSettings);
+        }
+        else
+        {
+            AudioManager.Get().PlayMusic(m_LoseAudioSettings);
+        }
+
+        Time.timeScale = 0; // Butun oyun duracal
+        m_GameState = GameState.Paused;
     }
 
     void OnGUI()
