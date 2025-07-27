@@ -37,6 +37,9 @@ public class GameManager : SingletonManager<GameManager>
     [Header("Spawning")]
     [SerializeField] private EnemySpawner m_EnemySpawner;
 
+    [Header("Audio")]
+    [SerializeField] private AudioSettings m_PlacementAudioSettings; // Building
+
     public Unit ActiveUnit;
 
     private Unit m_KingUnit;
@@ -606,6 +609,7 @@ public class GameManager : SingletonManager<GameManager>
         if (m_PlacementProcess.TryFinalizePlacement(out Vector3 buildPosition))
         {
             DisplayClickEffect(buildPosition, ClickType.Build);
+            AudioManager.Get().PlaySound(m_PlacementAudioSettings, buildPosition);
             m_BuildConfirmationBar.Hide();
 
             new BuildingProcess(m_PlacementProcess.BuildAction,

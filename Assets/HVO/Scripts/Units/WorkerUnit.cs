@@ -9,6 +9,7 @@ public class WorkerUnit : HumanoidUnit
     [SerializeField] private SpriteRenderer m_HoldingWoodSprite;
     [SerializeField] private SpriteRenderer m_HoldingGoldSprite;
     [SerializeField] private AudioSettings m_ChopAudioSettings;
+    [SerializeField] private AudioSettings m_BuildAudioSettings;
 
     private float m_ChoppingTimer;
     private float m_HitTreeTimer;
@@ -75,16 +76,6 @@ public class WorkerUnit : HumanoidUnit
         HandleResourceDisplay();
     }
 
-    protected override void OnSetDestination(DestinationSource source)
-    {
-        base.OnSetDestination(source);
-        
-        if (CurrentState == UnitState.Minning) return;
-
-        SetState(UnitState.Moving);
-        ResetState();
-    }
-
     public void OnBuildingFinished()
     {
         ResetState();
@@ -124,16 +115,6 @@ public class WorkerUnit : HumanoidUnit
         m_AssignedGoldMine = goldMine;
     }
 
-    protected override void Die()
-    {
-        base.Die();
-
-        if (m_AssignedTree != null)
-        {
-            m_AssignedTree.Release();
-        }
-    }
-
     public void OnEnterMine()
     {
         Hide();
@@ -154,6 +135,11 @@ public class WorkerUnit : HumanoidUnit
         }
     }
 
+    public void PlayBuildSound()
+    {
+        m_AudioManager.PlaySound(m_BuildAudioSettings, transform.position);
+    }
+
     bool TryToReturnResources(StructureUnit storage, float distanceTreshold = 0.5f)
     {
         if (storage != null)
@@ -165,6 +151,26 @@ public class WorkerUnit : HumanoidUnit
         }
 
         return false;
+    }
+    
+    protected override void OnSetDestination(DestinationSource source)
+    {
+        base.OnSetDestination(source);
+
+        if (CurrentState == UnitState.Minning) return;
+
+        SetState(UnitState.Moving);
+        ResetState();
+    }
+
+    protected override void Die()
+    {
+        base.Die();
+
+        if (m_AssignedTree != null)
+        {
+            m_AssignedTree.Release();
+        }
     }
 
     void HandleResourceDisplay()
