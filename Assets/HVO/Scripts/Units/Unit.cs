@@ -48,13 +48,13 @@ public abstract class Unit : MonoBehaviour
     public bool IsTarget;
 
     protected GameManager m_GameManager;
+    protected AudioManager m_AudioManager;
     protected Animator m_Animator;
     protected AIPawn m_AIPawn;
     protected SpriteRenderer m_SpriteRenderer;
     protected Material m_OriginalMaterial;
     protected Material m_HighlightMaterial;
     protected CapsuleCollider2D m_Collider;
-
     protected float m_NextUnitDetectionTime;
     protected float m_NextAutoAttackTime;
     protected int m_CurrentHealth;
@@ -99,6 +99,7 @@ public abstract class Unit : MonoBehaviour
 
         m_Collider = GetComponent<CapsuleCollider2D>();
         m_GameManager = GameManager.Get();
+        m_AudioManager = AudioManager.Get();
         m_SpriteRenderer = GetComponent<SpriteRenderer>();
         m_OriginalMaterial = m_SpriteRenderer.material;
         m_HighlightMaterial = Resources.Load<Material>("Materials/Outline");
@@ -217,16 +218,16 @@ public abstract class Unit : MonoBehaviour
 
     protected virtual void OnPlayAttackSound()
     {
-        AudioManager.Get().PlaySound(m_AttackAudioSettings, transform.position);
+        m_AudioManager.PlaySound(m_AttackAudioSettings, transform.position);
     }
 
     protected virtual void OnPlayInteractionSound()
     {
-        AudioManager.Get().PlaySound(m_InteractionAudioSettings, transform.position);
+        m_AudioManager.PlaySound(m_InteractionAudioSettings, transform.position);
     }
     protected virtual void OnPlayTerminationSound()
     {
-        AudioManager.Get().PlaySound(m_TerminationAudioSettings, transform.position);
+        m_AudioManager.PlaySound(m_TerminationAudioSettings, transform.position);
     }
 
     protected virtual void OnSetTask(UnitTask oldTask, UnitTask newTask)
