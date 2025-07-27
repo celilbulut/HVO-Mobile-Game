@@ -4412,7 +4412,7 @@ Tilemap:
       - {fileID: 7752229987998269982, guid: 987fe38bb54018643a8e26d12c31b4a2, type: 3}
       - {fileID: -4710801888167562894, guid: 987fe38bb54018643a8e26d12c31b4a2, type: 3}
       - {fileID: 6853023835892009477, guid: 987fe38bb54018643a8e26d12c31b4a2, type: 3}
-      m_AnimationSpeed: 10
+      m_AnimationSpeed: 10.000001
       m_AnimationTimeOffset: 0
       m_Flags: 0
   - first: {x: -4, y: -12, z: 0}
@@ -4787,7 +4787,7 @@ Tilemap:
       - {fileID: 7752229987998269982, guid: 987fe38bb54018643a8e26d12c31b4a2, type: 3}
       - {fileID: -4710801888167562894, guid: 987fe38bb54018643a8e26d12c31b4a2, type: 3}
       - {fileID: 6853023835892009477, guid: 987fe38bb54018643a8e26d12c31b4a2, type: 3}
-      m_AnimationSpeed: 10
+      m_AnimationSpeed: 10.000001
       m_AnimationTimeOffset: 0
       m_Flags: 0
   - first: {x: -7, y: -6, z: 0}
@@ -4982,7 +4982,7 @@ Tilemap:
       - {fileID: 7752229987998269982, guid: 987fe38bb54018643a8e26d12c31b4a2, type: 3}
       - {fileID: -4710801888167562894, guid: 987fe38bb54018643a8e26d12c31b4a2, type: 3}
       - {fileID: 6853023835892009477, guid: 987fe38bb54018643a8e26d12c31b4a2, type: 3}
-      m_AnimationSpeed: 10.000001
+      m_AnimationSpeed: 10
       m_AnimationTimeOffset: 0
       m_Flags: 0
   - first: {x: 6, y: -6, z: 0}
@@ -39255,7 +39255,7 @@ Tilemap:
       - {fileID: -2417548612333543299, guid: 2a6e02f059d6c0248a121ea59b1fdcc5, type: 3}
       - {fileID: 2648045286040330466, guid: 2a6e02f059d6c0248a121ea59b1fdcc5, type: 3}
       - {fileID: 2763439710183631591, guid: 2a6e02f059d6c0248a121ea59b1fdcc5, type: 3}
-      m_AnimationSpeed: 10.000001
+      m_AnimationSpeed: 10
       m_AnimationTimeOffset: 0
       m_Flags: 0
   - first: {x: 8, y: -29, z: 0}
@@ -40761,6 +40761,10 @@ PrefabInstance:
     - target: {fileID: 853016460006094372, guid: a61e42805c6a0444ea9b820f69c4167b, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2101799738912998142, guid: a61e42805c6a0444ea9b820f69c4167b, type: 3}
+      propertyPath: m_Health
+      value: 10
       objectReference: {fileID: 0}
     - target: {fileID: 2101799738912998142, guid: a61e42805c6a0444ea9b820f69c4167b, type: 3}
       propertyPath: m_AutoAttackDamage
