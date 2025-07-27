@@ -7,6 +7,8 @@ public class BuildingProcess
     private StructureUnit m_Structure;
     private ParticleSystem m_ConstructionEffect;
     private float m_ProgressTimer;
+    private float m_BuildSoundFrequency = 0.7f;
+    private float m_LastBuildSoundTime;
     private bool m_IsFinished;
     private bool InProgress => HasActiveWorker && m_Worker.CurrentState == UnitState.Building;
     public bool HasActiveWorker => m_Worker != null;
@@ -47,6 +49,12 @@ public class BuildingProcess
                 m_ConstructionEffect.Play();
             }
 
+            if (Time.time >= m_LastBuildSoundTime + m_BuildSoundFrequency)
+            {
+                m_Worker.PlayBuildSound();
+                m_LastBuildSoundTime = Time.time;
+            }
+
             if (m_ProgressTimer >= m_BuildAction.ConstructionTime)
                 {
                     m_IsFinished = true;
@@ -60,13 +68,11 @@ public class BuildingProcess
     public void AddWorker(WorkerUnit worker)
     {
         if(HasActiveWorker) return;
-        //Debug.Log("Adding Worker");
         m_Worker = worker;
     }
     public void RemoveWorker()
     {
         if (!HasActiveWorker) return;
-        //Debug.Log("Removing Worker");
         m_Worker = null;
         m_ConstructionEffect.Stop();
     }

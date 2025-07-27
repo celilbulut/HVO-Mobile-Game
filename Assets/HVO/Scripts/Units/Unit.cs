@@ -40,16 +40,21 @@ public abstract class Unit : MonoBehaviour
     [SerializeField] protected int m_Health = 100;
     [SerializeField] protected Color m_DamageFlashColor = new Color(1f, 0.63f, 0.63f, 1f);
 
+    [Header("Audio")]
+    [SerializeField] protected AudioSettings m_InteractionAudioSettings;
+    [SerializeField] protected AudioSettings m_AttackAudioSettings;
+    [SerializeField] protected AudioSettings m_TerminationAudioSettings;
+
     public bool IsTarget;
 
     protected GameManager m_GameManager;
+    protected AudioManager m_AudioManager;
     protected Animator m_Animator;
     protected AIPawn m_AIPawn;
     protected SpriteRenderer m_SpriteRenderer;
     protected Material m_OriginalMaterial;
     protected Material m_HighlightMaterial;
     protected CapsuleCollider2D m_Collider;
-
     protected float m_NextUnitDetectionTime;
     protected float m_NextAutoAttackTime;
     protected int m_CurrentHealth;
@@ -94,6 +99,7 @@ public abstract class Unit : MonoBehaviour
 
         m_Collider = GetComponent<CapsuleCollider2D>();
         m_GameManager = GameManager.Get();
+        m_AudioManager = AudioManager.Get();
         m_SpriteRenderer = GetComponent<SpriteRenderer>();
         m_OriginalMaterial = m_SpriteRenderer.material;
         m_HighlightMaterial = Resources.Load<Material>("Materials/Outline");
@@ -120,8 +126,13 @@ public abstract class Unit : MonoBehaviour
         OnSetState(CurrentState, state);
     }
 
-    public void SetTarget(Unit target)
+    public void SetTarget(Unit target, DestinationSource destinationSource = DestinationSource.CodeTriggered)
     {
+        if (destinationSource == DestinationSource.PlayerClick)
+        {
+            OnPlayInteractionSound();
+        }
+
         Target = target;
     }
 
@@ -164,6 +175,8 @@ public abstract class Unit : MonoBehaviour
 
     public void Select()
     {
+        OnPlayInteractionSound();
+
         Highlight();
         IsTarget = true;
 
@@ -197,7 +210,24 @@ public abstract class Unit : MonoBehaviour
 
     protected virtual void OnSetDestination(DestinationSource source)
     {
+        if (source == DestinationSource.PlayerClick)
+        {
+            OnPlayInteractionSound();
+        }
+    }
 
+    protected virtual void OnPlayAttackSound()
+    {
+        m_AudioManager.PlaySound(m_AttackAudioSettings, transform.position);
+    }
+
+    protected virtual void OnPlayInteractionSound()
+    {
+        m_AudioManager.PlaySound(m_InteractionAudioSettings, transform.position);
+    }
+    protected virtual void OnPlayTerminationSound()
+    {
+        m_AudioManager.PlaySound(m_TerminationAudioSettings, transform.position);
     }
 
     protected virtual void OnSetTask(UnitTask oldTask, UnitTask newTask)
@@ -250,6 +280,7 @@ public abstract class Unit : MonoBehaviour
 
     protected virtual void OnAttackReady(Unit target)
     {
+        OnPlayAttackSound();
         PerformAttackAnimation();
         StartCoroutine(DelayDamage(m_AutoAttackDamageDelay, m_AutoAttackDamage, Target));
     }
@@ -281,10 +312,11 @@ public abstract class Unit : MonoBehaviour
     protected virtual void Die()
     {
         SetState(UnitState.Dead);
+        OnPlayTerminationSound();
 
         if (m_AIPawn != null)
         {
-            StopMovement();            
+            StopMovement();
         }
         
         RunDeadEffect();
