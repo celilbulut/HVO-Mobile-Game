@@ -1,6 +1,8 @@
 
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
+using System.Linq;
 
 public enum ClickType
 {
@@ -8,6 +10,12 @@ public enum ClickType
     Attack,
     Build,
     Chop
+}
+
+public enum GameState
+{
+    Playing,
+    Paused
 }
 
 public class GameManager : SingletonManager<GameManager>
@@ -22,6 +30,7 @@ public class GameManager : SingletonManager<GameManager>
     [SerializeField] private ConfirmationBar m_BuildConfirmationBar;
     [SerializeField] private TextPopupController m_TextPopupController;
     [SerializeField] private ResourceDataUI m_ResourceDataUI;
+    [SerializeField] private GameOverLayout m_GameOverLayout;
 
     [Header("Camera Settings")]
     [SerializeField] private float m_PanSpeed = 100;
@@ -40,9 +49,12 @@ public class GameManager : SingletonManager<GameManager>
     [Header("Audio")]
     [SerializeField] private AudioSettings m_PlacementAudioSettings; // Building
     [SerializeField] private AudioSettings m_BackgroundMusicAudioSettings;
+    [SerializeField] private AudioSettings m_WinAudioSettings;
+    [SerializeField] private AudioSettings m_LoseAudioSettings;
 
     public Unit ActiveUnit;
 
+    private GameState m_GameState = GameState.Playing;
     private Unit m_KingUnit;
     private Tree[] m_Trees = new Tree[0];
     private List<Unit> m_PlayerUnits = new();
@@ -60,18 +72,36 @@ public class GameManager : SingletonManager<GameManager>
     public bool HasActiveUnit => ActiveUnit != null;
     public Unit KingUnit => m_KingUnit;
 
+    void OnDestroy()
+    {
+        m_GameOverLayout.OnRestartClicked -= RestartGame;
+        m_GameOverLayout.OnQuitClicked -= GoToMenu;
+    }
+
     void Start()
     {
+        Time.timeScale = 1;
         m_CameraController = new CameraController(m_PanSpeed, m_MobilePanSpeed);
         ClearActionBarUI();
         AddResources(500, 500);
 
         m_EnemySpawner.StartUp();
         AudioManager.Get().PlayMusic(m_BackgroundMusicAudioSettings);
+
+        m_GameOverLayout.OnRestartClicked += RestartGame;
+        m_GameOverLayout.OnQuitClicked += GoToMenu;
     }
 
     void Update()
     {
+        if (m_GameState == GameState.Paused) return;
+
+        if (m_EnemySpawner.SpawnState == SpawnState.Finished && m_Enemies.Count == 0)
+        {
+            HandleGameOver(true);
+            return;
+        }
+
         m_CameraController.Update();
 
         if (m_PlacementProcess != null)
@@ -86,7 +116,7 @@ public class GameManager : SingletonManager<GameManager>
     }
 
     public void RegisterUnit(Unit unit)
-    {        
+    {
         if (unit.IsPlayer)
         {
             if (unit.IsBuilding)
@@ -112,13 +142,14 @@ public class GameManager : SingletonManager<GameManager>
     {
         if (unit.IsPlayer)
         {
-            if (m_PlacementProcess != null)
-            {
-                CancelBuildPlacement();
-            }
-
             if (ActiveUnit == unit)
             {
+
+                if (m_PlacementProcess != null)
+                {
+                    CancelBuildPlacement();
+                }
+
                 ClearActionBarUI();
                 ActiveUnit.DeSelect();
                 ActiveUnit = null;
@@ -189,6 +220,11 @@ public class GameManager : SingletonManager<GameManager>
         return closestTree;
     }
 
+    IEnumerable<Unit> GetAllPlayerUnits()
+    {
+        return m_PlayerUnits.Concat(m_PlayerBuildings);
+    }
+
     // GameManager içinde yer alan bu metot, verilen konumdan (originPosition)
     // belirli bir mesafedeki en yakın Unit (oyuncu veya düşman) nesnesini bulur.
     public Unit FindClosestUnit(Vector3 originPosition, float maxDistance, bool IsPlayer)
@@ -196,7 +232,7 @@ public class GameManager : SingletonManager<GameManager>
         // Aranacak hedef listesini belirle: Eğer IsPlayer true ise düşman birimi arıyordur
         // (çünkü bu metot genellikle düşman için oyuncuyu, oyuncu için düşmanı arar)
         // Bu yüzden IsPlayer true ise oyuncu birimleri listesi döner
-        List<Unit> units = IsPlayer ? m_PlayerUnits : m_Enemies;
+        IEnumerable<Unit> units = IsPlayer ? GetAllPlayerUnits() : m_Enemies;
 
         // Performans açısından kare mesafe kullanılır (sqrt hesaplamasından kaçınmak için)
         float sqrMaxDistance = maxDistance * maxDistance;
@@ -306,6 +342,8 @@ public class GameManager : SingletonManager<GameManager>
 
     void FinalizeUnitTraining(TrainUnitActionSO trainUnitAction)
     {
+        AudioManager.Get().PlayButtonClick();
+
         if (!TryDeductResources(trainUnitAction.GoldCost, trainUnitAction.WoodCost))
         {
             Debug.Log("Not enough resources!");
@@ -354,6 +392,7 @@ public class GameManager : SingletonManager<GameManager>
 
     void CancelUnitTrainingConfirmation()
     {
+        AudioManager.Get().PlayButtonClick();
         m_BuildConfirmationBar.Hide();
     }
 
@@ -404,7 +443,7 @@ public class GameManager : SingletonManager<GameManager>
     {
         m_ActionBar.FocusAction(idx);
     }
-    
+
     public void CancelActiveUnit()
     {
         ActiveUnit.DeSelect();
@@ -413,7 +452,7 @@ public class GameManager : SingletonManager<GameManager>
         ClearActionBarUI();
     }
 
-    bool TryGetClickedResource<T>(RaycastHit2D hit, out T resource) where T: MonoBehaviour
+    bool TryGetClickedResource<T>(RaycastHit2D hit, out T resource) where T : MonoBehaviour
     {
         resource = null;
         if (hit.collider == null) return false;
@@ -495,11 +534,11 @@ public class GameManager : SingletonManager<GameManager>
 
     bool WorkerClickOnWoodStorage(Unit clickedUnit)
     {
-        return (clickedUnit is StructureUnit structure) && structure.CanStoreWood;        
+        return (clickedUnit is StructureUnit structure) && structure.CanStoreWood;
     }
     bool WorkerClickOnGoldStorage(Unit clickedUnit)
     {
-        return (clickedUnit is StructureUnit structure) && structure.CanStoreGold;        
+        return (clickedUnit is StructureUnit structure) && structure.CanStoreGold;
     }
 
     void HandleClickOnEnemy(Unit enemyUnit)
@@ -578,7 +617,10 @@ public class GameManager : SingletonManager<GameManager>
         {
             m_ActionBar.RegisterAction(
                 action.Icon,
-                () => action.Execute(this)
+                () => {
+                        AudioManager.Get().PlayButtonClick();
+                        action.Execute(this);
+                      }
             );
         }
     }
@@ -603,10 +645,10 @@ public class GameManager : SingletonManager<GameManager>
         }
 
         if (!TryDeductResources(m_PlacementProcess.GoldCost, m_PlacementProcess.WoodCost))
-            {
-                Debug.Log("Not Enough Resources!");
-                return;
-            }
+        {
+            Debug.Log("Not Enough Resources!");
+            return;
+        }
 
         if (m_PlacementProcess.TryFinalizePlacement(out Vector3 buildPosition))
         {
@@ -631,6 +673,7 @@ public class GameManager : SingletonManager<GameManager>
 
     void CancelBuildPlacement()
     {
+        AudioManager.Get().PlayButtonClick();
         m_BuildConfirmationBar.Hide();
         m_PlacementProcess.Cleanup();
         m_PlacementProcess = null;
@@ -648,13 +691,58 @@ public class GameManager : SingletonManager<GameManager>
         return false;
     }
 
+    public void HandleGameOver(bool isVictory)
+    {
+        if (isVictory)
+        {
+            AudioManager.Get().PlayMusic(m_WinAudioSettings);
+        }
+        else
+        {
+            AudioManager.Get().PlayMusic(m_LoseAudioSettings);
+        }
+
+        Time.timeScale = 0; // Butun oyun duracak
+        m_GameOverLayout.ShowGameOver(isVictory);
+        m_GameState = GameState.Paused;
+    }
+
+    void RestartGame()
+    {
+        foreach (var unit in m_PlayerUnits)
+        {
+            Destroy(unit.gameObject);
+        }
+
+        foreach (var enemy in m_Enemies)
+        {
+            Destroy(enemy.gameObject);
+        }
+
+        foreach (var structure in m_PlayerBuildings)
+        {
+            Destroy(structure.gameObject);
+        }
+
+        m_PlayerUnits.Clear();
+        m_Enemies.Clear();
+        m_PlayerBuildings.Clear();
+
+        SceneManager.LoadScene(SceneManager.GetActiveScene().name);
+    }
+
+    void GoToMenu()
+    {
+        SceneManager.LoadScene("MenuScene"); // Scene ismini yazimi onemli.
+    }
+
     void OnGUI()
     {
-        if (ActiveUnit != null)
-        {
-            GUI.Label(new Rect(50, 120, 200, 20), "State: " + ActiveUnit.CurrentState.ToString(), new GUIStyle { fontSize = 40 });
-            GUI.Label(new Rect(50, 160, 200, 20), "Task: " + ActiveUnit.CurrentTask.ToString(), new GUIStyle { fontSize = 40 });
-            GUI.Label(new Rect(50, 200, 200, 20), "Stance: " + ActiveUnit.CurrentStance.ToString(), new GUIStyle { fontSize = 40 });
-        }
+        //if (ActiveUnit != null)
+        //{
+        //    GUI.Label(new Rect(50, 120, 200, 20), "State: " + ActiveUnit.CurrentState.ToString(), new GUIStyle { fontSize = 40 });
+        //    GUI.Label(new Rect(50, 160, 200, 20), "Task: " + ActiveUnit.CurrentTask.ToString(), new GUIStyle { fontSize = 40 });
+        //    GUI.Label(new Rect(50, 200, 200, 20), "Stance: " + ActiveUnit.CurrentStance.ToString(), new GUIStyle { fontSize = 40 });
+        //}
     }
 }
