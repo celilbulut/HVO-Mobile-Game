@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using System.Linq;
 
 public enum ClickType
 {
@@ -141,13 +142,14 @@ public class GameManager : SingletonManager<GameManager>
     {
         if (unit.IsPlayer)
         {
-            if (m_PlacementProcess != null)
-            {
-                CancelBuildPlacement();
-            }
-
             if (ActiveUnit == unit)
             {
+
+                if (m_PlacementProcess != null)
+                {
+                    CancelBuildPlacement();
+                }
+
                 ClearActionBarUI();
                 ActiveUnit.DeSelect();
                 ActiveUnit = null;
@@ -218,6 +220,11 @@ public class GameManager : SingletonManager<GameManager>
         return closestTree;
     }
 
+    IEnumerable<Unit> GetAllPlayerUnits()
+    {
+        return m_PlayerUnits.Concat(m_PlayerBuildings);
+    }
+
     // GameManager içinde yer alan bu metot, verilen konumdan (originPosition)
     // belirli bir mesafedeki en yakın Unit (oyuncu veya düşman) nesnesini bulur.
     public Unit FindClosestUnit(Vector3 originPosition, float maxDistance, bool IsPlayer)
@@ -225,7 +232,7 @@ public class GameManager : SingletonManager<GameManager>
         // Aranacak hedef listesini belirle: Eğer IsPlayer true ise düşman birimi arıyordur
         // (çünkü bu metot genellikle düşman için oyuncuyu, oyuncu için düşmanı arar)
         // Bu yüzden IsPlayer true ise oyuncu birimleri listesi döner
-        List<Unit> units = IsPlayer ? m_PlayerUnits : m_Enemies;
+        IEnumerable<Unit> units = IsPlayer ? GetAllPlayerUnits() : m_Enemies;
 
         // Performans açısından kare mesafe kullanılır (sqrt hesaplamasından kaçınmak için)
         float sqrMaxDistance = maxDistance * maxDistance;
