@@ -198,7 +198,10 @@ public abstract class Unit : MonoBehaviour
 
     public void StopMovement()
     {
-        m_AIPawn.Stop(); // IPawn üzerindeki stop fonksiyonu çağrılır
+        if (m_AIPawn != null)
+        {
+            m_AIPawn.Stop(); // IPawn üzerindeki stop fonksiyonu çağrılır            
+        }
     }
 
     public Vector3 GetTopPosition()

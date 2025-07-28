@@ -27,11 +27,13 @@ public class HomeScreen : MonoBehaviour
 
     void OnPlayButtonClicked()
     {
+        AudioManager.Get().PlayButtonClick();
         SceneManager.LoadScene("GameScene"); // Scene adi dogru olmali.
     }
 
     void OnExitButtonClicked()
     {
+        AudioManager.Get().PlayButtonClick();
         Application.Quit();
     }
 }

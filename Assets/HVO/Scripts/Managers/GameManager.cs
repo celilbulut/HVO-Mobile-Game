@@ -342,6 +342,8 @@ public class GameManager : SingletonManager<GameManager>
 
     void FinalizeUnitTraining(TrainUnitActionSO trainUnitAction)
     {
+        AudioManager.Get().PlayButtonClick();
+
         if (!TryDeductResources(trainUnitAction.GoldCost, trainUnitAction.WoodCost))
         {
             Debug.Log("Not enough resources!");
@@ -390,6 +392,7 @@ public class GameManager : SingletonManager<GameManager>
 
     void CancelUnitTrainingConfirmation()
     {
+        AudioManager.Get().PlayButtonClick();
         m_BuildConfirmationBar.Hide();
     }
 
@@ -614,7 +617,10 @@ public class GameManager : SingletonManager<GameManager>
         {
             m_ActionBar.RegisterAction(
                 action.Icon,
-                () => action.Execute(this)
+                () => {
+                        AudioManager.Get().PlayButtonClick();
+                        action.Execute(this);
+                      }
             );
         }
     }
@@ -667,6 +673,7 @@ public class GameManager : SingletonManager<GameManager>
 
     void CancelBuildPlacement()
     {
+        AudioManager.Get().PlayButtonClick();
         m_BuildConfirmationBar.Hide();
         m_PlacementProcess.Cleanup();
         m_PlacementProcess = null;

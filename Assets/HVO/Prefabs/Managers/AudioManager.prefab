@@ -47,6 +47,17 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_MusicSource: {fileID: 5245428144977671724}
   m_InitialPoolSize: 10
+  m_UiButtonClickAudioSetting:
+    Clips:
+    - {fileID: 8300000, guid: b82923d6242d79b4abfb2d280a407dde, type: 3}
+    Volume: 0.8
+    Pitch: 1
+    Loop: 0
+    SpatialBlend: 0
+    MinDistance: 1
+    MaxDistance: 15
+    Priority: 128
+    RolloffMode: 1
 --- !u!82 &5245428144977671724
 AudioSource:
   m_ObjectHideFlags: 0
