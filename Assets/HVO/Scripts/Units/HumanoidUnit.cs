@@ -38,16 +38,16 @@ public class HumanoidUnit : Unit
         (
             (transform.position.x - m_LastPosition.x),
             (transform.position.y - m_LastPosition.y)
-        ) / Time.deltaTime;
+        ) / Time.unscaledDeltaTime;
 
         m_LastPosition = transform.position;
-        m_SmoothedSpeed = Mathf.Lerp(m_SmoothedSpeed, CurrentSpeed, Time.deltaTime * m_SmoothFactor);
+        m_SmoothedSpeed = Mathf.Lerp(m_SmoothedSpeed, CurrentSpeed, Time.unscaledDeltaTime * m_SmoothFactor);
 
         if (CurrentState != UnitState.Attacking)
-        {
-            var state = m_SmoothedSpeed > 0.1f ? UnitState.Moving : UnitState.Idle;
-            SetState(state);
-        }
+            {
+                var state = m_SmoothedSpeed > 0.1f ? UnitState.Moving : UnitState.Idle;
+                SetState(state);
+            }
 
         if (IsTarget
             && CurrentState == UnitState.Moving
@@ -91,5 +91,10 @@ public class HumanoidUnit : Unit
     {
         yield return new WaitForSeconds(delay);
         Destroy(gameObject);
+
+        if (IsKingUnit)
+        {
+            m_GameManager.HandleGameOver(false);
+        }
     }
 }
