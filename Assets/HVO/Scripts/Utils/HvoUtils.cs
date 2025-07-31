@@ -50,14 +50,6 @@ public static class HvoUtils
     //GameManager.cs ile baglantili.
     public static bool IsPointerOverUIElement() //Action bara artik tiklayinca ilerlemiyor unit oraya dogru.
     {
-        if(Input.touchCount > 0)
-        {
-            var touch = Input.GetTouch(0);
-            return EventSystem.current.IsPointerOverGameObject(touch.fingerId);
-        }
-        else
-        {
-            return EventSystem.current.IsPointerOverGameObject();
-        }
+        return EventSystem.current.IsPointerOverGameObject();
     }
 }
