@@ -32,6 +32,10 @@ public class GameManager : SingletonManager<GameManager>
     [SerializeField] private ResourceDataUI m_ResourceDataUI;
     [SerializeField] private GameOverLayout m_GameOverLayout;
 
+    [Header("Resources")]
+    [SerializeField] private int m_Gold = 0;
+    [SerializeField] private int m_Wood = 0;
+
     [Header("Camera Settings")]
     [SerializeField] private float m_PanSpeed = 100;
     [SerializeField] private float m_MobilePanSpeed = 10;
@@ -64,8 +68,6 @@ public class GameManager : SingletonManager<GameManager>
     private CameraController m_CameraController;
     private PlacementProcess m_PlacementProcess;
 
-    private int m_Gold = 0;
-    private int m_Wood = 0;
     public int Gold => m_Gold;
     public int Wood => m_Wood;
     public GoldMine ActiveGoldMine => m_ActiveGoldMine;
@@ -83,7 +85,7 @@ public class GameManager : SingletonManager<GameManager>
         Time.timeScale = 1;
         m_CameraController = new CameraController(m_PanSpeed, m_MobilePanSpeed);
         ClearActionBarUI();
-        AddResources(500, 500);
+        AddResources(0, 0);
 
         m_EnemySpawner.StartUp();
         AudioManager.Get().PlayMusic(m_BackgroundMusicAudioSettings);
